@@ -16,6 +16,7 @@ import {
   WalletCards,
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
+import { useContent } from '@/contexts/ContentContext'
 import { listPlans, listServices } from '@/lib/repository'
 import { fallbackFaqs, fallbackPlans, fallbackServices } from '@/lib/catalog'
 import { SectionHeading } from '@/components/marketing/PageHero'
@@ -26,6 +27,7 @@ import type { Plan, Service } from '@/types/domain'
 
 export function HomePage() {
   const { user } = useAuth()
+  const { get } = useContent()
   const navigate = useNavigate()
   const [prompt, setPrompt] = useState('')
   const [plans, setPlans] = useState<Plan[]>(fallbackPlans)
@@ -73,8 +75,10 @@ export function HomePage() {
               With PeaceAI.
             </h1>
             <p className="mx-auto mt-7 max-w-2xl text-balance text-base leading-7 text-slate-400 sm:text-lg">
-              One thoughtful platform for intelligent conversations, AI-assisted development,
-              defensive cybersecurity, private cloud storage, and collaboration.
+              {get(
+                'home.hero.subtitle',
+                'One thoughtful platform for intelligent conversations, AI-assisted development, defensive cybersecurity, private cloud storage, and collaboration.',
+              )}
             </p>
 
             <form
@@ -121,7 +125,7 @@ export function HomePage() {
                 <Check className="h-3.5 w-3.5 text-accent" /> Free plan available
               </span>
               <span className="flex items-center gap-1.5">
-                <Check className="h-3.5 w-3.5 text-accent" /> 6 GiB private storage
+                <Check className="h-3.5 w-3.5 text-accent" /> Up to 50 GiB private storage
               </span>
               <span className="flex items-center gap-1.5">
                 <Check className="h-3.5 w-3.5 text-accent" /> Server-enforced limits
@@ -137,7 +141,7 @@ export function HomePage() {
         <div className="container-page grid gap-6 py-8 sm:grid-cols-2 lg:grid-cols-4">
           {[
             { value: '5', label: 'layers of platform capability' },
-            { value: '6 GiB', label: 'default private storage' },
+            { value: '50 GiB', label: 'storage on Business' },
             { value: '3', label: 'configurable plans' },
             { value: 'RLS', label: 'database-enforced access' },
           ].map((item) => (
@@ -171,7 +175,7 @@ export function HomePage() {
               description:
                 'Turn a project description into a structured proposal with features, milestones, risks, and starter structure.',
               to: '/development',
-              tone: 'text-sky-300 bg-sky-400/10',
+              tone: 'text-iris-light bg-iris/10',
             },
             {
               icon: ShieldCheck,
@@ -185,7 +189,7 @@ export function HomePage() {
               icon: Files,
               title: 'Cloud Storage',
               description:
-                'Organize source code, documents, and data in private folders with 6 GiB included by default.',
+                'Organize source code, documents, and data in private folders with storage that scales from 2 GiB to 50 GiB by plan.',
               to: user ? '/app/storage' : '/signup',
               tone: 'text-amber-300 bg-amber-400/10',
             },

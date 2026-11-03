@@ -8,6 +8,8 @@ export type SubscriptionStatus = 'active' | 'past_due' | 'canceled' | 'trialing'
 export type PaymentStatus = 'pending' | 'successful' | 'failed' | 'refunded' | 'cancelled'
 export type KnowledgeStatus = 'queued' | 'processing' | 'ready' | 'failed'
 export type AuditSeverity = 'info' | 'warning' | 'critical'
+export type DeliveryStatus = 'requested' | 'building' | 'ready' | 'delivered' | 'live'
+export type DeliveryPaymentStatus = 'unpaid' | 'pending' | 'paid' | 'refunded'
 
 export interface Profile {
   id: string
@@ -214,6 +216,43 @@ export interface ServiceRequest {
   profile?: Pick<Profile, 'full_name' | 'email'>
   created_at: string
   updated_at: string
+}
+
+export interface AppCredentials {
+  app_url: string | null
+  admin_url: string | null
+  username: string | null
+  password: string | null
+  api_key: string | null
+  notes: string | null
+}
+
+export interface AppDelivery {
+  id: string
+  user_id: string
+  service_id: string
+  service?: Service
+  project_name: string
+  description: string
+  status: DeliveryStatus
+  price_rwf: number
+  payment_status: DeliveryPaymentStatus
+  credentials: AppCredentials
+  credentials_released: boolean
+  admin_notes: string | null
+  requested_at: string
+  delivered_at: string | null
+  updated_at: string
+  profile?: Pick<Profile, 'full_name' | 'email'>
+}
+
+export interface ContentBlock {
+  key: string
+  label: string
+  section: string
+  value: string
+  updated_at: string
+  updated_by: string | null
 }
 
 export interface Quotation {

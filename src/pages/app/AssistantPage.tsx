@@ -6,19 +6,14 @@ import rehypeHighlight from 'rehype-highlight'
 import {
   Archive,
   ArchiveRestore,
-  ArrowDown,
   ArrowUp,
   Bot,
   Check,
   Copy,
   Download,
-  Edit2,
   FileCode2,
   FileText,
   GitBranch,
-  History,
-  Image,
-  MessageSquarePlus,
   MoreHorizontal,
   Paperclip,
   Pencil,
@@ -26,7 +21,6 @@ import {
   RefreshCw,
   RotateCcw,
   Search,
-  Settings2,
   ShieldAlert,
   Sparkles,
   ThumbsDown,
@@ -808,7 +802,7 @@ export function AssistantPage() {
 
 function EmptyAssistant({ onSuggestion }: { onSuggestion: (text: string) => void }) {
   const quickActions = [
-    { icon: Code2, label: 'Code Review', prompt: 'Review this code for bugs, security issues, performance, and best practices. Provide detailed feedback with suggestions.' },
+    { icon: FileCode2, label: 'Code Review', prompt: 'Review this code for bugs, security issues, performance, and best practices. Provide detailed feedback with suggestions.' },
     { icon: ShieldAlert, label: 'Security Audit', prompt: 'Perform a comprehensive security audit. Check for OWASP Top 10 vulnerabilities, authentication issues, and recommend fixes.' },
     { icon: FileText, label: 'Write Docs', prompt: 'Generate comprehensive documentation including README, API docs, and usage examples.' },
     { icon: GitBranch, label: 'Architecture', prompt: 'Design a scalable system architecture. Include diagrams description, tech stack, and implementation plan.' },

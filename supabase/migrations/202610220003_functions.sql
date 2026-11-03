@@ -376,7 +376,10 @@ begin
   end if;
 
   update public.profiles
-  set storage_quota_bytes = greatest(storage_quota_bytes, v_plan.storage_bytes),
+  set storage_quota_bytes = case
+        when role = 'admin' then greatest(storage_quota_bytes, v_plan.storage_bytes)
+        else 0
+      end,
       updated_at = now()
   where id = v_payment.user_id;
 

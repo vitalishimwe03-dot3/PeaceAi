@@ -64,8 +64,12 @@ export function AdminUsersPage() {
   const save = async () => {
     if (!editUser || !currentUser) return
     const quota = Number(quotaGib)
-    if (!Number.isFinite(quota) || quota < 0.1 || quota > 100) {
-      toast({ title: 'Invalid storage quota', description: 'Set a quota between 0.1 and 100 GiB.', tone: 'error' })
+    if (!Number.isFinite(quota) || quota < 0 || quota > 500) {
+      toast({
+        title: 'Invalid storage quota',
+        description: 'Set 0 to inherit the plan allowance, or an override up to 500 GiB.',
+        tone: 'error',
+      })
       return
     }
     const isSelf = editUser.id === currentUser.id
@@ -168,7 +172,9 @@ export function AdminUsersPage() {
                   </td>
                   <td className="px-4 py-3"><Badge tone={profile.role === 'admin' ? 'violet' : 'neutral'}>{profile.role}</Badge></td>
                   <td className="px-4 py-3"><Badge tone={statusTone(profile.status)}>{profile.status}</Badge></td>
-                  <td className="px-4 py-3 text-[11px] text-slate-400">{formatBytes(profile.storage_quota_bytes)}</td>
+                  <td className="px-4 py-3 text-[11px] text-slate-400">
+                    {profile.storage_quota_bytes > 0 ? formatBytes(profile.storage_quota_bytes) : 'Plan default'}
+                  </td>
                   <td className="px-4 py-3 text-[11px] text-slate-500">{formatDate(profile.created_at)}</td>
                   <td className="px-4 py-3 text-right">
                     <button type="button" onClick={() => openEdit(profile)} className="rounded-lg p-2 text-slate-500 hover:bg-white/5 hover:text-white" aria-label={`Edit ${profile.email}`}>
@@ -229,12 +235,14 @@ export function AdminUsersPage() {
             <Input
               label="Storage quota (GiB)"
               type="number"
-              min={0.1}
-              max={100}
+              min={0}
+              max={500}
               step={0.1}
               value={quotaGib}
               onChange={(event) => setQuotaGib(event.target.value)}
-              hint={`Currently ${formatBytes(editUser.storage_quota_bytes)}. Changes affect future uploads.`}
+              hint={`Use 0 to inherit the active plan. Currently ${
+                editUser.storage_quota_bytes > 0 ? formatBytes(editUser.storage_quota_bytes) : 'the plan allowance'
+              }. Administrators always receive at least 500 GiB.`}
             />
             {role === 'admin' && editUser.role !== 'admin' ? (
               <div className="rounded-xl border border-rose-400/20 bg-rose-400/[0.04] p-3 text-[11px] leading-5 text-rose-100/70">

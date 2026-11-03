@@ -11,24 +11,24 @@ values
     'free',
     'Free',
     'Explore PeaceAI and build your first ideas with a generous starting allowance.',
-    0, 0, 'month', 25, 5, false, 6442450944, 2,
-    '["25 AI messages per day","Basic code assistance","Selected AI tools","Basic collaboration","6 GiB private cloud storage","Standard response priority"]'::jsonb,
+    0, 0, 'month', 25, 5, false, 2147483648, 2,
+    '["25 AI messages per day","Basic code assistance","Selected AI tools","Basic collaboration","2 GiB private cloud storage","App delivery after payment (1 active build)","Standard response priority"]'::jsonb,
     true, 1
   ),
   (
     'pro',
     'Pro',
     'For developers, students, and professionals who use AI every day.',
-    5000, 50000, 'month', 250, 20, true, 6442450944, 25,
-    '["250 AI messages per day","Advanced coding assistance","Expanded project planning","File sharing and collaboration","6 GiB included storage","Premium model access where configured","Higher processing priority"]'::jsonb,
+    5000, 50000, 'month', 250, 20, true, 16106127360, 25,
+    '["250 AI messages per day","Advanced coding assistance","Expanded project planning","File sharing and collaboration","15 GiB included storage","Credentialed app delivery after payment","Premium model access where configured","Higher processing priority"]'::jsonb,
     true, 2
   ),
   (
     'business',
     'Business',
     'Higher limits and team-oriented workflows for organizations.',
-    15000, 150000, 'month', 1200, 60, true, 6442450944, 100,
-    '["1,200 AI messages per day","Enhanced collaboration","Team-oriented features","Advanced project workflows","6 GiB included per eligible user","Optional additional storage","Priority support"]'::jsonb,
+    15000, 150000, 'month', 1200, 60, true, 53687091200, 100,
+    '["1,200 AI messages per day","Enhanced collaboration","Team-oriented features","Advanced project workflows","50 GiB included per eligible user","Priority app delivery and credential handover","Priority support"]'::jsonb,
     true, 3
   )
 on conflict (slug) do update

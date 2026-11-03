@@ -126,7 +126,7 @@ export function ConfirmDialog({
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex h-10 items-center rounded-xl px-4 text-sm font-semibold text-slate-300 hover:bg-white/5"
+            className="inline-flex h-10 items-center rounded-full px-4 text-sm font-semibold text-slate-300 hover:bg-white/5"
           >
             Cancel
           </button>
@@ -135,7 +135,7 @@ export function ConfirmDialog({
             onClick={onConfirm}
             disabled={loading}
             className={cn(
-              'inline-flex h-10 items-center rounded-xl px-4 text-sm font-semibold text-white disabled:opacity-50',
+              'inline-flex h-10 items-center rounded-full px-4 text-sm font-semibold text-white disabled:opacity-50',
               destructive ? 'bg-rose-500 hover:bg-rose-400' : 'bg-accent text-ink-950 hover:bg-accent-light',
             )}
           >

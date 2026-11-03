@@ -59,7 +59,7 @@ function fallbackProfile(session: Session): Profile {
     avatar_url: (session.user.user_metadata?.avatar_url as string | undefined) ?? null,
     role: 'user',
     status: 'active',
-    storage_quota_bytes: 6 * 1024 * 1024 * 1024,
+    storage_quota_bytes: 0,
     created_at: session.user.created_at,
     updated_at: new Date().toISOString(),
   }

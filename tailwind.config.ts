@@ -7,20 +7,25 @@ export default {
     extend: {
       colors: {
         ink: {
-          950: '#050b17',
-          900: '#07101f',
-          850: '#0a1526',
-          800: '#0d1a2e',
-          700: '#14243d',
-          600: '#1d3354',
+          950: '#0e0913',
+          900: '#151020',
+          850: '#1b1429',
+          800: '#241a35',
+          700: '#332347',
+          600: '#48325f',
         },
         accent: {
-          DEFAULT: '#34e3b0',
-          light: '#6ff2cb',
-          dark: '#1cb88b',
+          DEFAULT: '#ff8a4c',
+          light: '#ffb07d',
+          dark: '#e0682c',
+        },
+        iris: {
+          DEFAULT: '#a78bfa',
+          light: '#c4b5fd',
+          dark: '#7c5cf0',
         },
         sky: {
-          450: '#47a9ff',
+          450: '#a78bfa',
         },
       },
       fontFamily: {
@@ -29,8 +34,8 @@ export default {
         mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
       },
       boxShadow: {
-        glow: '0 0 0 1px rgba(52,227,176,.16), 0 24px 80px -24px rgba(52,227,176,.22)',
-        card: '0 20px 50px -28px rgba(0,0,0,.65)',
+        glow: '0 0 0 1px rgba(255,138,76,.18), 0 28px 90px -26px rgba(255,138,76,.28)',
+        card: '0 24px 60px -30px rgba(0,0,0,.72)',
       },
       keyframes: {
         'fade-up': {

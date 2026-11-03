@@ -5,8 +5,8 @@
 @layer base {
   :root {
     color-scheme: dark;
-    --ink: 7 16 31;
-    --accent: 52 227 176;
+    --ink: 14 9 19;
+    --accent: 255 138 76;
   }
 
   * {
@@ -21,18 +21,19 @@
     @apply bg-ink-950 font-sans text-slate-200 antialiased;
     min-width: 320px;
     background-image:
-      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(52, 227, 176, 0.1), transparent),
-      radial-gradient(ellipse 40% 40% at 90% 10%, rgba(71, 169, 255, 0.08), transparent);
+      radial-gradient(ellipse 70% 45% at 12% -10%, rgba(255, 138, 76, 0.14), transparent),
+      radial-gradient(ellipse 45% 40% at 92% 4%, rgba(167, 139, 250, 0.12), transparent),
+      radial-gradient(ellipse 60% 40% at 50% 110%, rgba(255, 138, 76, 0.06), transparent);
     background-attachment: fixed;
   }
 
   ::selection {
-    background: rgba(52, 227, 176, 0.28);
+    background: rgba(255, 138, 76, 0.3);
     color: #fff;
   }
 
   :focus-visible {
-    outline: 2px solid rgb(52 227 176);
+    outline: 2px solid rgb(255 138 76);
     outline-offset: 2px;
   }
 
@@ -91,11 +92,11 @@
   }
 
   .card-surface {
-    @apply rounded-2xl border border-white/10 bg-ink-900/80 shadow-card;
+    @apply rounded-[1.35rem] border border-white/10 bg-ink-900/75 shadow-card;
   }
 
   .eyebrow {
-    @apply inline-flex items-center gap-2 rounded-full border border-accent/20 bg-accent/[0.07] px-3 py-1 text-xs font-medium uppercase tracking-[0.16em] text-accent;
+    @apply inline-flex items-center gap-2 rounded-full border border-accent/25 bg-accent/[0.09] px-3 py-1 text-xs font-medium uppercase tracking-[0.16em] text-accent;
   }
 
   .gradient-text {
@@ -151,7 +152,7 @@
     @apply rounded bg-white/10 px-1.5 py-0.5 font-mono text-[0.86em] text-accent-light;
   }
   .prose-peace pre {
-    @apply my-4 overflow-x-auto rounded-xl border border-white/10 bg-[#050b17] p-4 font-mono text-[13px] leading-6;
+    @apply my-4 overflow-x-auto rounded-xl border border-white/10 bg-[#0e0913] p-4 font-mono text-[13px] leading-6;
   }
   .prose-peace table {
     @apply my-4 w-full border-collapse text-sm;

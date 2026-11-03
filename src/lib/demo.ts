@@ -1,8 +1,10 @@
 import { DEFAULT_STORAGE_QUOTA_BYTES } from './env'
 import { fallbackPlans, fallbackServices, serviceCategories } from './catalog'
 import type {
+  AppDelivery,
   AuditLog,
   ChatThread,
+  ContentBlock,
   Conversation,
   Connection,
   DirectMessage,
@@ -34,6 +36,8 @@ interface PreviewState {
   proposals: ProjectProposal[]
   proposalShares: Array<{ id: string; proposal_id: string; shared_with: string; created_at: string }>
   serviceRequests: ServiceRequest[]
+  appDeliveries: AppDelivery[]
+  contentBlocks: ContentBlock[]
   plans: Plan[]
   services: Service[]
   subscriptions: Subscription[]
@@ -229,6 +233,60 @@ function seed(): PreviewState {
       created_at: nowIso,
     },
   ]
+  const appDeliveries: AppDelivery[] = [
+    {
+      id: 'preview-delivery-1',
+      user_id: 'preview-user',
+      service_id: fallbackServices[0]?.id ?? 'preview-service',
+      project_name: 'Skills Directory MVP',
+      description:
+        'A private dashboard for the district youth office to review trainer profiles and approve new listings before they go public.',
+      status: 'building',
+      price_rwf: 450000,
+      payment_status: 'pending',
+      credentials: {
+        app_url: null,
+        admin_url: null,
+        username: null,
+        password: null,
+        api_key: null,
+        notes: null,
+      },
+      credentials_released: false,
+      admin_notes: 'Discovery approved. Building the review workflow this week.',
+      requested_at: nowIso,
+      delivered_at: null,
+      updated_at: nowIso,
+    },
+  ]
+  const contentBlocks: ContentBlock[] = [
+    {
+      key: 'home.hero.title',
+      label: 'Home hero title',
+      section: 'home',
+      value: 'Secure AI, software, and storage for people who take their ideas seriously.',
+      updated_at: nowIso,
+      updated_by: 'preview-admin',
+    },
+    {
+      key: 'home.hero.subtitle',
+      label: 'Home hero subtitle',
+      section: 'home',
+      value:
+        'PeaceAI brings guarded AI conversations, real software delivery, defensive security, private storage, and collaboration together in one calm workspace.',
+      updated_at: nowIso,
+      updated_by: 'preview-admin',
+    },
+    {
+      key: 'footer.tagline',
+      label: 'Footer tagline',
+      section: 'global',
+      value:
+        'Secure AI conversations, software development, defensive cybersecurity, private storage, and collaboration in one thoughtful platform.',
+      updated_at: nowIso,
+      updated_by: 'preview-admin',
+    },
+  ]
   const datasets: KnowledgeDataset[] = [
     {
       id: 'preview-dataset-1',
@@ -255,6 +313,8 @@ function seed(): PreviewState {
     proposals,
     proposalShares: [],
     serviceRequests: [],
+    appDeliveries,
+    contentBlocks,
     plans: fallbackPlans,
     services: fallbackServices.map((service) => ({
       ...service,

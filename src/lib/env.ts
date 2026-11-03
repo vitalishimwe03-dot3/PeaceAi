@@ -10,4 +10,7 @@ export const isSupabaseConfigured = Boolean(env.supabaseUrl && env.supabaseAnonK
 
 export const APP_NAME = 'PeaceAI'
 export const GIB = 1024 * 1024 * 1024
-export const DEFAULT_STORAGE_QUOTA_BYTES = 6 * GIB
+// A profile quota of 0 means "inherit the storage allowance from the active plan".
+export const DEFAULT_STORAGE_QUOTA_BYTES = 0
+// The owner administrator always receives the largest allocation on the platform.
+export const ADMIN_STORAGE_QUOTA_BYTES = 500 * GIB

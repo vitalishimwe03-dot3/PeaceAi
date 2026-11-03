@@ -21,6 +21,7 @@ import {
   getSubscription,
   listPayments,
   listPlans,
+  resolveStorageQuota,
   setSubscriptionCancellation,
   startCheckout,
 } from '@/lib/repository'
@@ -208,7 +209,9 @@ export function BillingPage() {
               </div>
               <div className="text-right">
                 <p className="text-[10px] uppercase tracking-wider text-slate-600">Included storage</p>
-                <p className="mt-1 text-sm font-medium text-white">{formatBytes(currentPlan?.storage_bytes ?? user.profile.storage_quota_bytes)}</p>
+                <p className="mt-1 text-sm font-medium text-white">
+                  {formatBytes(resolveStorageQuota(user.profile, currentPlan?.storage_bytes ?? 0))}
+                </p>
                 <p className="mt-1 text-[10px] text-slate-600">
                   {currentPlan ? `${currentPlan.ai_messages_per_day} messages/day · ${currentPlan.ai_requests_per_minute} requests/min` : ''}
                 </p>

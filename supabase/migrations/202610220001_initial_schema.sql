@@ -21,7 +21,7 @@ create table if not exists public.profiles (
   avatar_url text,
   role text not null default 'user' check (role in ('user', 'admin')),
   status text not null default 'active' check (status in ('active', 'suspended', 'pending')),
-  storage_quota_bytes bigint not null default 6442450944 check (storage_quota_bytes >= 0),
+  storage_quota_bytes bigint not null default 0 check (storage_quota_bytes >= 0),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -40,7 +40,7 @@ create table if not exists public.plans (
   ai_messages_per_day integer not null default 25 check (ai_messages_per_day >= 0),
   ai_requests_per_minute integer not null default 5 check (ai_requests_per_minute >= 0),
   premium_models boolean not null default false,
-  storage_bytes bigint not null default 6442450944 check (storage_bytes >= 0),
+  storage_bytes bigint not null default 2147483648 check (storage_bytes >= 0),
   proposal_limit_per_month integer not null default 2 check (proposal_limit_per_month >= 0),
   features jsonb not null default '[]'::jsonb check (jsonb_typeof(features) = 'array'),
   active boolean not null default true,

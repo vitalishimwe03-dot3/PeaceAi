@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { Mail, Phone } from 'lucide-react'
 import { Logo } from '@/components/ui/Logo'
+import { useContent } from '@/contexts/ContentContext'
 import { env } from '@/lib/env'
 
 const columns = [
@@ -36,14 +37,19 @@ const columns = [
 ]
 
 export function Footer() {
+  const { get } = useContent()
   return (
-    <footer className="border-t border-white/[0.06] bg-ink-950">
-      <div className="container-page grid gap-10 py-14 md:grid-cols-2 lg:grid-cols-5">
-        <div className="lg:col-span-2">
+    <footer className="relative overflow-hidden border-t border-white/[0.06] bg-ink-950">
+      <div className="pointer-events-none absolute -left-24 top-0 h-64 w-64 rounded-full bg-accent/[0.06] blur-3xl" aria-hidden="true" />
+      <div className="pointer-events-none absolute -right-16 bottom-0 h-64 w-64 rounded-full bg-iris/[0.07] blur-3xl" aria-hidden="true" />
+      <div className="container-page relative grid gap-10 py-14 md:grid-cols-2 lg:grid-cols-6">
+        <div className="lg:col-span-3">
           <Logo />
           <p className="mt-4 max-w-sm text-sm leading-6 text-slate-400">
-            Secure AI conversations, software development, defensive cybersecurity, private storage,
-            and collaboration in one thoughtful platform.
+            {get(
+              'footer.tagline',
+              'Secure AI conversations, software development, defensive cybersecurity, private storage, and collaboration in one thoughtful platform.',
+            )}
           </p>
           <div className="mt-5 space-y-2.5 text-sm">
             <a

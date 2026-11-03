@@ -25,6 +25,7 @@ import { LegalPage } from '@/pages/public/LegalPage'
 import { DashboardPage } from '@/pages/app/DashboardPage'
 import { AssistantPage } from '@/pages/app/AssistantPage'
 import { DevelopmentPage } from '@/pages/app/DevelopmentPage'
+import { AppAppsPage } from '@/pages/app/AppAppsPage'
 import { StoragePage } from '@/pages/app/StoragePage'
 import { CollaborationPage } from '@/pages/app/CollaborationPage'
 import { AppServicesPage } from '@/pages/app/AppServicesPage'
@@ -37,8 +38,10 @@ import { AdminUsersPage } from '@/pages/admin/AdminUsersPage'
 import { AdminAiPage } from '@/pages/admin/AdminAiPage'
 import { AdminKnowledgePage } from '@/pages/admin/AdminKnowledgePage'
 import { AdminRequestsPage } from '@/pages/admin/AdminRequestsPage'
+import { AdminDeliveriesPage } from '@/pages/admin/AdminDeliveriesPage'
 import { AdminServicesPage } from '@/pages/admin/AdminServicesPage'
 import { AdminPlansPage } from '@/pages/admin/AdminPlansPage'
+import { AdminContentPage } from '@/pages/admin/AdminContentPage'
 import { AdminSettingsPage } from '@/pages/admin/AdminSettingsPage'
 import { AdminAuditPage } from '@/pages/admin/AdminAuditPage'
 import { NotFoundPage } from '@/pages/NotFoundPage'
@@ -97,6 +100,7 @@ export default function App() {
           <Route path="/app" element={<DashboardPage />} />
           <Route path="/app/assistant" element={<AssistantPage />} />
           <Route path="/app/development" element={<DevelopmentPage />} />
+          <Route path="/app/apps" element={<AppAppsPage />} />
           <Route path="/app/storage" element={<StoragePage />} />
           <Route path="/app/collaboration" element={<CollaborationPage />} />
           <Route path="/app/services" element={<AppServicesPage />} />
@@ -111,8 +115,10 @@ export default function App() {
             <Route path="ai" element={<AdminAiPage />} />
             <Route path="knowledge" element={<AdminKnowledgePage />} />
             <Route path="requests" element={<AdminRequestsPage />} />
+            <Route path="deliveries" element={<AdminDeliveriesPage />} />
             <Route path="services" element={<AdminServicesPage />} />
             <Route path="plans" element={<AdminPlansPage />} />
+            <Route path="content" element={<AdminContentPage />} />
             <Route path="settings" element={<AdminSettingsPage />} />
             <Route path="audit" element={<AdminAuditPage />} />
           </Route>

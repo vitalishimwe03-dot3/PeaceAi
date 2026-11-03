@@ -305,7 +305,7 @@ export function StoragePage() {
           <Progress value={used} max={quota} tone={used / quota > 0.9 ? 'rose' : 'accent'} />
         </div>
         <p className="mt-2 text-[10px] text-slate-600">
-          6 GiB default allocation. Uploads are validated for type and size; archives are never executed.
+          Your quota follows your active plan. Uploads are validated for type and size; archives are never executed.
         </p>
       </div>
 

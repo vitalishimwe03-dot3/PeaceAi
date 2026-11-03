@@ -7,7 +7,7 @@ type Size = 'sm' | 'md' | 'lg' | 'icon'
 
 const variants: Record<Variant, string> = {
   primary:
-    'bg-accent text-ink-950 shadow-[0_8px_30px_-12px_rgba(52,227,176,.65)] hover:bg-accent-light active:bg-accent-dark disabled:bg-accent/40',
+    'bg-accent text-ink-950 shadow-[0_10px_32px_-12px_rgba(255,138,76,.7)] hover:bg-accent-light active:bg-accent-dark disabled:bg-accent/40',
   secondary: 'bg-white text-ink-950 hover:bg-slate-200 disabled:bg-white/50',
   outline: 'border border-white/15 bg-white/[0.03] text-white hover:border-white/25 hover:bg-white/[0.07]',
   ghost: 'text-slate-300 hover:bg-white/[0.06] hover:text-white',
@@ -32,7 +32,7 @@ export function buttonStyles({
   className?: string
 } = {}) {
   return cn(
-    'inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition-colors focus-ring disabled:pointer-events-none disabled:opacity-50',
+    'inline-flex items-center justify-center gap-2 rounded-full font-semibold transition-colors focus-ring disabled:pointer-events-none disabled:opacity-50',
     variants[variant],
     sizes[size],
     className,

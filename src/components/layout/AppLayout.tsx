@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import {
+  AppWindow,
   Bell,
   Bot,
   ChevronDown,
@@ -28,6 +29,7 @@ const userNav = [
   { label: 'Overview', to: '/app', end: true, icon: LayoutDashboard },
   { label: 'AI Assistant', to: '/app/assistant', icon: Bot },
   { label: 'AI Development', to: '/app/development', icon: Code2 },
+  { label: 'My Apps', to: '/app/apps', icon: AppWindow },
   { label: 'Cloud Storage', to: '/app/storage', icon: Files },
   { label: 'Collaboration', to: '/app/collaboration', icon: MessagesSquare },
   { label: 'Service Requests', to: '/app/services', icon: Wrench },
@@ -65,7 +67,7 @@ export function AppLayout() {
       <div className="flex">
         <aside
           className={cn(
-            'fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-white/[0.06] bg-ink-900/95 backdrop-blur-xl transition-transform lg:sticky lg:top-0 lg:h-screen lg:translate-x-0',
+            'fixed inset-y-3 left-3 z-40 flex w-64 flex-col overflow-hidden rounded-[1.5rem] border border-white/[0.08] bg-ink-900/90 shadow-card backdrop-blur-xl transition-transform lg:sticky lg:top-3 lg:h-[calc(100vh-1.5rem)] lg:translate-x-0',
             sidebarOpen ? 'translate-x-0' : '-translate-x-full',
           )}
           aria-label="Workspace navigation"
@@ -133,7 +135,8 @@ export function AppLayout() {
         ) : null}
 
         <div className="flex min-w-0 flex-1 flex-col">
-          <header className="sticky top-0 z-20 flex h-[70px] items-center justify-between gap-4 border-b border-white/[0.06] bg-ink-950/80 px-4 backdrop-blur-xl sm:px-6">
+          <header className="sticky top-0 z-20 px-3 pt-3 sm:px-4">
+            <div className="flex h-16 items-center justify-between gap-4 rounded-2xl border border-white/[0.08] bg-ink-950/70 px-4 backdrop-blur-xl sm:px-5">
             <div className="flex items-center gap-3">
               <button
                 type="button"
@@ -201,9 +204,10 @@ export function AppLayout() {
                 ) : null}
               </div>
             </div>
+            </div>
           </header>
 
-          <main id="main-content" className="min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+          <main id="main-content" className="min-w-0 flex-1 px-3 py-6 sm:px-4 lg:px-6 lg:py-8">
             <Outlet />
           </main>
         </div>

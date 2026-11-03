@@ -53,8 +53,9 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-40 border-b border-white/[0.06] bg-ink-950/80 backdrop-blur-xl">
-      <div className="container-page flex h-[70px] items-center justify-between gap-4">
+    <header className="sticky top-0 z-40 bg-ink-950/60 backdrop-blur-xl">
+      <div className="container-page pt-3">
+        <div className="flex h-16 items-center justify-between gap-4 rounded-2xl border border-white/[0.08] bg-ink-900/75 px-4 shadow-card sm:px-5">
         <Logo />
 
         <nav className="hidden items-center gap-1 xl:flex" aria-label="Primary navigation">
@@ -62,8 +63,8 @@ export function Header() {
             to="/"
             className={({ isActive }) =>
               cn(
-                'rounded-lg px-3 py-2 text-sm font-medium text-slate-300 transition-colors hover:text-white',
-                isActive && 'text-white',
+                'rounded-full px-3 py-2 text-sm font-medium text-slate-300 transition-colors hover:text-white',
+                isActive && 'text-accent',
               )
             }
           >
@@ -75,8 +76,8 @@ export function Header() {
               to={item.to}
               className={({ isActive }) =>
                 cn(
-                  'rounded-lg px-3 py-2 text-sm font-medium text-slate-300 transition-colors hover:bg-white/[0.04] hover:text-white',
-                  isActive && 'bg-white/[0.05] text-white',
+                  'rounded-full px-3 py-2 text-sm font-medium text-slate-300 transition-colors hover:bg-white/[0.04] hover:text-white',
+                  isActive && 'bg-accent/10 text-accent',
                 )
               }
             >
@@ -151,6 +152,7 @@ export function Header() {
         >
           {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
+        </div>
       </div>
 
       {mobileOpen ? (

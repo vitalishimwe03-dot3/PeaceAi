@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 import { AuthProvider } from '@/contexts/AuthContext'
+import { ContentProvider } from '@/contexts/ContentContext'
 import { ToastProvider } from '@/contexts/ToastContext'
 import './index.css'
 
@@ -14,7 +15,9 @@ createRoot(root).render(
     <BrowserRouter>
       <AuthProvider>
         <ToastProvider>
-          <App />
+          <ContentProvider>
+            <App />
+          </ContentProvider>
         </ToastProvider>
       </AuthProvider>
     </BrowserRouter>

@@ -97,7 +97,7 @@ export function SignUpPage() {
     <div>
       <h1 className="text-3xl font-semibold">Create your account</h1>
       <p className="mt-2 text-sm text-slate-400">
-        Start free with AI assistance, 6 GiB private storage, and collaboration tools.
+        Start free with AI assistance, 2 GiB private storage, and collaboration tools.
       </p>
 
       {isPreview ? (

@@ -1,4 +1,4 @@
-import { isSupabaseConfigured } from './env'
+import { ADMIN_STORAGE_QUOTA_BYTES, isSupabaseConfigured } from './env'
 import { supabase } from './supabase'
 import {
   clearPreviewSession,
@@ -18,7 +18,9 @@ import { safeFileName } from './utils'
 import type {
   AdminUserRow,
   AiModel,
+  AppDelivery,
   AuditLog,
+  ContentBlock,
   ChatThread,
   Connection,
   Conversation,
@@ -41,7 +43,6 @@ import type {
 
 const FILE_BUCKET = 'user-files'
 const KNOWLEDGE_BUCKET = 'knowledge'
-const GIB = 1024 * 1024 * 1024
 
 function client() {
   if (!supabase) throw new Error('Supabase is not configured.')
@@ -52,6 +53,17 @@ function startOfToday() {
   const d = new Date()
   d.setHours(0, 0, 0, 0)
   return d.toISOString()
+}
+
+export function resolveStorageQuota(
+  profile: Pick<Profile, 'role' | 'storage_quota_bytes'> | null | undefined,
+  planStorageBytes: number,
+): number {
+  const override = Number(profile?.storage_quota_bytes ?? 0)
+  if (profile?.role === 'admin') {
+    return Math.max(ADMIN_STORAGE_QUOTA_BYTES, override)
+  }
+  return override > 0 ? override : planStorageBytes
 }
 
 export const preview = {
@@ -221,8 +233,10 @@ export async function getUsageSummary(userId: string): Promise<UsageSummary> {
     const proposalsThisMonth = state.proposals.filter(
       (proposal) => proposal.user_id === userId && proposal.created_at.slice(0, 7) === new Date().toISOString().slice(0, 7),
     ).length
-    const quota =
-      state.profiles.find((profile) => profile.id === userId)?.storage_quota_bytes ?? plan.storage_bytes
+    const quota = resolveStorageQuota(
+      state.profiles.find((profile) => profile.id === userId),
+      plan.storage_bytes,
+    )
     return {
       messagesToday,
       messagesLimit: plan.ai_messages_per_day,
@@ -265,6 +279,7 @@ export async function getUsageSummary(userId: string): Promise<UsageSummary> {
     (sum, row) => sum + Number(row.size_bytes ?? 0),
     0,
   )
+  const profile = await getProfile(userId)
   return {
     messagesToday: messagesToday ?? 0,
     messagesLimit: plan.ai_messages_per_day,
@@ -277,7 +292,7 @@ export async function getUsageSummary(userId: string): Promise<UsageSummary> {
     proposalsThisMonth: proposalResult.count ?? 0,
     proposalsLimit: plan.proposal_limit_per_month,
     storageUsed,
-    storageQuota: (await getProfile(userId))?.storage_quota_bytes ?? plan.storage_bytes,
+    storageQuota: resolveStorageQuota(profile, plan.storage_bytes),
     planName: plan.name,
   }
 }
@@ -563,6 +578,7 @@ export async function uploadFile(
 ): Promise<StoredFile> {
   validateUpload(file)
   const safeName = safeFileName(file.name) || 'upload'
+  const plan = await getEffectivePlan(userId)
   if (!isSupabaseConfigured) {
     const fileId = id('file')
     await storePreviewBlob(fileId, file)
@@ -571,7 +587,7 @@ export async function uploadFile(
       const used = state.files
         .filter((item) => item.owner_id === userId)
         .reduce((sum, item) => sum + item.size_bytes, 0)
-      const quota = profile?.storage_quota_bytes ?? 6 * GIB
+      const quota = resolveStorageQuota(profile, plan.storage_bytes)
       if (used + file.size > quota) throw new Error('Storage quota exceeded. Delete files or upgrade your plan.')
       const record: StoredFile = {
         id: fileId,
@@ -596,7 +612,7 @@ export async function uploadFile(
     .eq('owner_id', userId)
   if (usageError) throw usageError
   const used = (usageRows ?? []).reduce((sum, row) => sum + Number(row.size_bytes), 0)
-  if (used + file.size > (profile?.storage_quota_bytes ?? 6 * GIB)) {
+  if (used + file.size > resolveStorageQuota(profile, plan.storage_bytes)) {
     throw new Error('Storage quota exceeded. Delete files or upgrade your plan.')
   }
 
@@ -1539,6 +1555,191 @@ export async function updateServiceRequestStatus(
     .from('service_requests')
     .update({ status, admin_notes: notes, updated_at: new Date().toISOString() })
     .eq('id', requestId)
+  if (error) throw error
+}
+
+export async function listAppDeliveries(userId: string): Promise<AppDelivery[]> {
+  if (!isSupabaseConfigured) {
+    const state = loadState()
+    return state.appDeliveries
+      .filter((delivery) => delivery.user_id === userId)
+      .map((delivery) => ({
+        ...delivery,
+        service: state.services.find((service) => service.id === delivery.service_id),
+      }))
+  }
+  const { data, error } = await client()
+    .from('app_deliveries')
+    .select('*, service:services(*)')
+    .eq('user_id', userId)
+    .order('requested_at', { ascending: false })
+  if (error) throw error
+  return (data ?? []) as AppDelivery[]
+}
+
+export async function listAllAppDeliveries(): Promise<AppDelivery[]> {
+  if (!isSupabaseConfigured) {
+    const state = loadState()
+    return state.appDeliveries.map((delivery) => {
+      const profile = state.profiles.find((item) => item.id === delivery.user_id)
+      return {
+        ...delivery,
+        service: state.services.find((service) => service.id === delivery.service_id),
+        profile: profile ? { full_name: profile.full_name, email: profile.email } : undefined,
+      }
+    })
+  }
+  const { data, error } = await client()
+    .from('app_deliveries')
+    .select(
+      '*, service:services(*), profile:profiles!app_deliveries_user_id_fkey(full_name,email)',
+    )
+    .order('requested_at', { ascending: false })
+  if (error) throw error
+  return (data ?? []) as AppDelivery[]
+}
+
+export async function getAppDelivery(deliveryId: string): Promise<AppDelivery | null> {
+  if (!isSupabaseConfigured) {
+    const state = loadState()
+    const delivery = state.appDeliveries.find((item) => item.id === deliveryId)
+    if (!delivery) return null
+    const profile = state.profiles.find((item) => item.id === delivery.user_id)
+    return {
+      ...delivery,
+      service: state.services.find((service) => service.id === delivery.service_id),
+      profile: profile ? { full_name: profile.full_name, email: profile.email } : undefined,
+    }
+  }
+  const { data, error } = await client()
+    .from('app_deliveries')
+    .select(
+      '*, service:services(*), profile:profiles!app_deliveries_user_id_fkey(full_name,email)',
+    )
+    .eq('id', deliveryId)
+    .maybeSingle()
+  if (error) throw error
+  return (data as AppDelivery | null) ?? null
+}
+
+export async function createAppDelivery(
+  userId: string,
+  request: {
+    serviceId: string
+    projectName: string
+    description: string
+  },
+): Promise<AppDelivery> {
+  if (!isSupabaseConfigured) {
+    return mutateState((state) => {
+      const record: AppDelivery = {
+        id: id('delivery'),
+        user_id: userId,
+        service_id: request.serviceId,
+        service: state.services.find((service) => service.id === request.serviceId),
+        project_name: request.projectName,
+        description: request.description,
+        status: 'requested',
+        price_rwf: 0,
+        payment_status: 'unpaid',
+        credentials: {
+          app_url: null,
+          admin_url: null,
+          username: null,
+          password: null,
+          api_key: null,
+          notes: null,
+        },
+        credentials_released: false,
+        admin_notes: null,
+        requested_at: new Date().toISOString(),
+        delivered_at: null,
+        updated_at: new Date().toISOString(),
+      }
+      state.appDeliveries.unshift(record)
+      return record
+    })
+  }
+  const { data, error } = await client()
+    .from('app_deliveries')
+    .insert({
+      user_id: userId,
+      service_id: request.serviceId,
+      project_name: request.projectName,
+      description: request.description,
+    })
+    .select()
+    .single()
+  if (error) throw error
+  return data as AppDelivery
+}
+
+export async function updateAppDelivery(
+  deliveryId: string,
+  patch: Partial<
+    Pick<
+      AppDelivery,
+      | 'project_name'
+      | 'description'
+      | 'status'
+      | 'price_rwf'
+      | 'payment_status'
+      | 'credentials'
+      | 'credentials_released'
+      | 'admin_notes'
+      | 'delivered_at'
+    >
+  >,
+): Promise<void> {
+  if (!isSupabaseConfigured) {
+    mutateState((state) => {
+      const delivery = state.appDeliveries.find((item) => item.id === deliveryId)
+      if (!delivery) return
+      Object.assign(delivery, patch)
+      delivery.updated_at = new Date().toISOString()
+    })
+    return
+  }
+  const { error } = await client()
+    .from('app_deliveries')
+    .update({ ...patch, updated_at: new Date().toISOString() })
+    .eq('id', deliveryId)
+  if (error) throw error
+}
+
+export async function listContentBlocks(): Promise<ContentBlock[]> {
+  if (!isSupabaseConfigured) {
+    return loadState().contentBlocks
+  }
+  const { data, error } = await client()
+    .from('content_blocks')
+    .select('*')
+    .order('section')
+    .order('key')
+  if (error) throw error
+  return (data ?? []) as ContentBlock[]
+}
+
+export async function updateContentBlock(
+  key: string,
+  value: string,
+  adminId: string,
+): Promise<void> {
+  if (!isSupabaseConfigured) {
+    mutateState((state) => {
+      const block = state.contentBlocks.find((item) => item.key === key)
+      if (block) {
+        block.value = value
+        block.updated_at = new Date().toISOString()
+        block.updated_by = adminId
+      }
+    })
+    return
+  }
+  const { error } = await client()
+    .from('content_blocks')
+    .update({ value, updated_by: adminId, updated_at: new Date().toISOString() })
+    .eq('key', key)
   if (error) throw error
 }
 
