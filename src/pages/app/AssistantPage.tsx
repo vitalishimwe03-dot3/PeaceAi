@@ -6,20 +6,34 @@ import rehypeHighlight from 'rehype-highlight'
 import {
   Archive,
   ArchiveRestore,
+  ArrowDown,
   ArrowUp,
   Bot,
   Check,
   Copy,
+  Download,
+  Edit2,
   FileCode2,
+  FileText,
+  GitBranch,
+  History,
+  Image,
   MessageSquarePlus,
   MoreHorizontal,
   Paperclip,
   Pencil,
+  Plus,
   RefreshCw,
+  RotateCcw,
+  Search,
+  Settings2,
   ShieldAlert,
   Sparkles,
+  ThumbsDown,
+  ThumbsUp,
   Trash2,
   X,
+  Zap,
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useToast } from '@/contexts/ToastContext'
@@ -53,10 +67,12 @@ const TEXT_EXTENSIONS = [
 ]
 
 const suggestions = [
-  'Plan a secure member portal for a small organization.',
-  'Explain this error and help me debug it.',
-  'Review my authentication approach for missing authorization checks.',
-  'Draft a project proposal for an inventory tracking application.',
+  'Plan a secure full-stack application with modern architecture',
+  'Debug and fix complex code issues with step by step explanation',
+  'Conduct a comprehensive security audit on my codebase',
+  'Build a scalable API with authentication, rate limiting & documentation',
+  'Optimize performance and improve code quality',
+  'Create production-ready React components with best practices',
 ]
 
 export function AssistantPage() {
@@ -162,6 +178,8 @@ export function AssistantPage() {
     setLimit(null)
     setSidebarOpen(false)
     setParams({ new: '1' })
+    setPrompt('')
+    setAttachments([])
     window.setTimeout(() => textareaRef.current?.focus(), 80)
   }
 
@@ -352,30 +370,43 @@ export function AssistantPage() {
         aria-label="Conversation history"
       >
         <div className="flex items-center justify-between gap-2 border-b border-white/[0.06] p-3">
-          <div className="inline-flex rounded-lg border border-white/10 bg-ink-950/60 p-0.5">
+          <div className="flex items-center gap-2">
+            <div className="inline-flex rounded-lg border border-white/10 bg-ink-950/60 p-0.5">
+              <button
+                type="button"
+                onClick={() => setView('active')}
+                className={cn('rounded-md px-2.5 py-1.5 text-[11px]', view === 'active' ? 'bg-white/10 text-white' : 'text-slate-500')}
+              >
+                Active
+              </button>
+              <button
+                type="button"
+                onClick={() => setView('archived')}
+                className={cn('rounded-md px-2.5 py-1.5 text-[11px]', view === 'archived' ? 'bg-white/10 text-white' : 'text-slate-500')}
+              >
+                Archived
+              </button>
+            </div>
+          </div>
+          <div className="flex items-center gap-1">
             <button
               type="button"
-              onClick={() => setView('active')}
-              className={cn('rounded-md px-2.5 py-1.5 text-[11px]', view === 'active' ? 'bg-white/10 text-white' : 'text-slate-500')}
+              className="rounded-lg p-2 text-slate-400 hover:bg-white/5 hover:text-white"
+              aria-label="Search conversations"
+              title="Search"
             >
-              Active
+              <Search className="h-4 w-4" />
             </button>
             <button
               type="button"
-              onClick={() => setView('archived')}
-              className={cn('rounded-md px-2.5 py-1.5 text-[11px]', view === 'archived' ? 'bg-white/10 text-white' : 'text-slate-500')}
+              onClick={startNew}
+              className="rounded-lg p-2 text-slate-400 hover:bg-white/5 hover:text-accent"
+              aria-label="New conversation"
+              title="New chat"
             >
-              Archived
+              <Plus className="h-4 w-4" />
             </button>
           </div>
-          <button
-            type="button"
-            onClick={startNew}
-            className="rounded-lg p-2 text-slate-400 hover:bg-white/5 hover:text-accent"
-            aria-label="New conversation"
-          >
-            <MessageSquarePlus className="h-4 w-4" />
-          </button>
         </div>
         <div className="scrollbar-thin flex-1 overflow-y-auto p-2">
           {loadingList ? (
@@ -439,11 +470,16 @@ export function AssistantPage() {
             >
               <MoreHorizontal className="h-4 w-4" />
             </button>
-            <div className="min-w-0">
-              <p className="truncate text-sm font-medium text-white">{selectedConversation?.title || 'New conversation'}</p>
-              <p className="text-[10px] text-slate-500">
-                {isPreview ? 'AI provider not connected' : 'Protected server-side AI'}
-              </p>
+            <div className="min-w-0 flex items-center gap-2">
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-accent/10 text-accent">
+                <Bot className="h-3.5 w-3.5" />
+              </span>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-medium text-white">{selectedConversation?.title || 'New conversation'}</p>
+                <p className="text-[10px] text-slate-500">
+                  {isPreview ? 'AI provider not connected' : 'PeaceAI • Secure & Fast'}
+                </p>
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-1.5">
@@ -451,12 +487,12 @@ export function AssistantPage() {
               <select
                 value={selectedModel}
                 onChange={(event) => setSelectedModel(event.target.value)}
-                className="max-w-[160px] rounded-lg border border-white/10 bg-ink-900 px-2.5 py-1.5 text-[11px] text-slate-300 focus:outline-none focus:ring-1 focus:ring-accent"
+                className="max-w-[180px] rounded-lg border border-white/10 bg-ink-900 px-2.5 py-1.5 text-[11px] text-slate-300 focus:outline-none focus:ring-1 focus:ring-accent"
                 aria-label="Select AI model"
               >
                 {models.map((model) => (
                   <option key={model.id} value={model.model_id}>
-                    {model.display_name}{model.is_premium ? ' · Premium' : ''}
+                    {model.display_name}{model.is_premium ? ' ✦' : ''}
                   </option>
                 ))}
               </select>
@@ -554,15 +590,41 @@ export function AssistantPage() {
                         <span>{relativeTime(message.created_at)}</span>
                         {message.model ? <span>· {message.model}</span> : null}
                         {message.role === 'assistant' ? (
-                          <button
-                            type="button"
-                            onClick={() => void copyText(message.content, message.id)}
-                            className="inline-flex items-center gap-1 rounded px-1 py-0.5 hover:bg-white/5 hover:text-slate-300"
-                            aria-label="Copy response"
-                          >
-                            {copiedId === message.id ? <Check className="h-3 w-3 text-accent" /> : <Copy className="h-3 w-3" />}
-                            {copiedId === message.id ? 'Copied' : 'Copy'}
-                          </button>
+                          <div className="flex items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => void copyText(message.content, message.id)}
+                              className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 hover:bg-white/5 hover:text-slate-300"
+                              aria-label="Copy response"
+                              title="Copy"
+                            >
+                              {copiedId === message.id ? <Check className="h-3 w-3 text-accent" /> : <Copy className="h-3 w-3" />}
+                            </button>
+                            <button
+                              type="button"
+                              className="inline-flex items-center rounded px-1.5 py-0.5 hover:bg-white/5 hover:text-emerald-400"
+                              aria-label="Good response"
+                              title="Good response"
+                            >
+                              <ThumbsUp className="h-3 w-3" />
+                            </button>
+                            <button
+                              type="button"
+                              className="inline-flex items-center rounded px-1.5 py-0.5 hover:bg-white/5 hover:text-rose-400"
+                              aria-label="Bad response"
+                              title="Bad response"
+                            >
+                              <ThumbsDown className="h-3 w-3" />
+                            </button>
+                            <button
+                              type="button"
+                              className="inline-flex items-center rounded px-1.5 py-0.5 hover:bg-white/5 hover:text-slate-300"
+                              aria-label="Regenerate"
+                              title="Regenerate"
+                            >
+                              <RotateCcw className="h-3 w-3" />
+                            </button>
+                          </div>
                         ) : null}
                       </div>
                     </div>
@@ -570,13 +632,17 @@ export function AssistantPage() {
                 ))}
                 {sending ? (
                   <div className="flex gap-3">
-                    <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
+                    <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-accent/20 to-accent/5 text-accent">
                       <Bot className="h-4 w-4" />
                     </span>
                     <div className="rounded-2xl rounded-bl-md border border-white/[0.07] bg-white/[0.025] px-4 py-3">
-                      <div className="flex items-center gap-2 text-xs text-slate-400">
-                        <span className="h-1.5 w-1.5 animate-pulse-soft rounded-full bg-accent" />
-                        Thinking through your request…
+                      <div className="flex items-center gap-2">
+                        <div className="flex gap-1">
+                          <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-accent [animation-delay:-0.3s]" />
+                          <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-accent [animation-delay:-0.15s]" />
+                          <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-accent" />
+                        </div>
+                        <span className="text-xs text-slate-400">PeaceAI is thinking...</span>
                       </div>
                     </div>
                   </div>
@@ -639,7 +705,7 @@ export function AssistantPage() {
                 ))}
               </div>
             ) : null}
-            <div className="rounded-2xl border border-white/10 bg-ink-900/80 p-2 shadow-sm">
+            <div className="rounded-2xl border border-white/10 bg-ink-900/80 p-2 shadow-[0_0_80px_-40px_rgba(52,227,176,0.3)] transition-all focus-within:border-accent/40 focus-within:shadow-[0_0_80px_-30px_rgba(52,227,176,0.4)]">
               <label htmlFor="assistant-prompt" className="sr-only">Message PeaceAI</label>
               <textarea
                 ref={textareaRef}
@@ -653,7 +719,7 @@ export function AssistantPage() {
                   }
                 }}
                 rows={2}
-                placeholder="Ask about code, plan a project, or describe a security concern…"
+                placeholder="Message PeaceAI... (Shift+Enter for new line)"
                 className="max-h-40 min-h-[3rem] w-full resize-none bg-transparent px-2.5 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none"
               />
               <div className="flex items-center justify-between gap-2 px-1">
@@ -671,18 +737,26 @@ export function AssistantPage() {
                     onClick={() => fileRef.current?.click()}
                     className="rounded-lg p-2 text-slate-500 hover:bg-white/5 hover:text-white"
                     aria-label="Attach text or code file"
-                    title="Attach text or code file (max 512 KB)"
+                    title="Attach files (max 512 KB)"
                   >
                     <Paperclip className="h-4 w-4" />
                   </button>
+                  <button
+                    type="button"
+                    className="rounded-lg p-2 text-slate-500 hover:bg-white/5 hover:text-white"
+                    aria-label="Add context"
+                    title="More options"
+                  >
+                    <Plus className="h-4 w-4" />
+                  </button>
                   <span className="hidden text-[10px] text-slate-600 sm:block">
-                    Enter to send · Shift+Enter for a new line
+                    ⏎ Send · ⇧⏎ New line
                   </span>
                 </div>
                 <button
                   type="submit"
                   disabled={sending || !prompt.trim()}
-                  className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent text-ink-950 transition-colors hover:bg-accent-light disabled:opacity-40"
+                  className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-accent to-accent/80 text-ink-950 transition-all hover:scale-105 hover:shadow-[0_0_20px_-5px_rgba(52,227,176,0.6)] disabled:opacity-40 disabled:hover:scale-100"
                   aria-label="Send message"
                 >
                   {sending ? <Spinner className="h-4 w-4 text-ink-950" /> : <ArrowUp className="h-4 w-4" />}
@@ -733,30 +807,59 @@ export function AssistantPage() {
 }
 
 function EmptyAssistant({ onSuggestion }: { onSuggestion: (text: string) => void }) {
+  const quickActions = [
+    { icon: Code2, label: 'Code Review', prompt: 'Review this code for bugs, security issues, performance, and best practices. Provide detailed feedback with suggestions.' },
+    { icon: ShieldAlert, label: 'Security Audit', prompt: 'Perform a comprehensive security audit. Check for OWASP Top 10 vulnerabilities, authentication issues, and recommend fixes.' },
+    { icon: FileText, label: 'Write Docs', prompt: 'Generate comprehensive documentation including README, API docs, and usage examples.' },
+    { icon: GitBranch, label: 'Architecture', prompt: 'Design a scalable system architecture. Include diagrams description, tech stack, and implementation plan.' },
+  ]
+
   return (
-    <div className="flex flex-col items-center justify-center py-16 text-center">
-      <span className="flex h-14 w-14 items-center justify-center rounded-2xl border border-accent/20 bg-accent/10 text-accent">
-        <Sparkles className="h-6 w-6" />
-      </span>
-      <h1 className="mt-5 text-2xl font-semibold">How can I help you build or secure something?</h1>
-      <p className="mt-2 max-w-md text-sm leading-6 text-slate-400">
-        Ask a technical question, attach code for review, or turn an idea into a structured project plan.
+    <div className="flex flex-col items-center justify-center py-12 text-center">
+      <div className="relative">
+        <span className="flex h-16 w-16 items-center justify-center rounded-2xl border border-accent/30 bg-gradient-to-br from-accent/20 to-accent/5 text-accent shadow-[0_0_60px_-20px_rgba(52,227,176,0.8)]">
+          <Sparkles className="h-7 w-7" />
+        </span>
+        <div className="absolute -right-1 -top-1 h-3 w-3 rounded-full bg-accent animate-pulse" />
+      </div>
+      <h1 className="mt-6 text-3xl font-semibold gradient-text">PeaceAI Assistant</h1>
+      <p className="mt-2 max-w-lg text-sm leading-6 text-slate-400">
+        Your intelligent coding companion. Build, debug, secure, and optimize with advanced AI assistance.
       </p>
-      <div className="mt-7 grid w-full max-w-2xl gap-2 sm:grid-cols-2">
-        {suggestions.map((suggestion) => (
+      
+      <div className="mt-8 grid w-full max-w-2xl grid-cols-2 gap-2 sm:grid-cols-4">
+        {quickActions.map((action) => (
           <button
-            key={suggestion}
+            key={action.label}
             type="button"
-            onClick={() => onSuggestion(suggestion)}
-            className="rounded-xl border border-white/[0.08] bg-white/[0.02] px-4 py-3 text-left text-xs leading-5 text-slate-400 transition-colors hover:border-accent/25 hover:text-slate-200"
+            onClick={() => onSuggestion(action.prompt)}
+            className="group flex flex-col items-center gap-2 rounded-xl border border-white/[0.08] bg-white/[0.02] px-3 py-4 transition-all hover:border-accent/40 hover:bg-accent/5 hover:shadow-[0_0_40px_-20px_rgba(52,227,176,0.6)]"
           >
-            {suggestion}
+            <action.icon className="h-5 w-5 text-slate-400 transition-colors group-hover:text-accent" />
+            <span className="text-xs text-slate-400 transition-colors group-hover:text-slate-200">{action.label}</span>
           </button>
         ))}
       </div>
-      <p className="mt-6 max-w-md text-[10px] leading-5 text-slate-600">
-        In preview mode, no AI provider is connected. A configuration notice will be shown instead of
-        a generated answer.
+
+      <div className="mt-8 w-full max-w-2xl">
+        <p className="mb-3 text-xs text-slate-500">Popular prompts</p>
+        <div className="grid gap-2 sm:grid-cols-2">
+          {suggestions.map((suggestion) => (
+            <button
+              key={suggestion}
+              type="button"
+              onClick={() => onSuggestion(suggestion)}
+              className="flex items-center gap-2 rounded-xl border border-white/[0.08] bg-white/[0.02] px-4 py-3 text-left text-xs leading-5 text-slate-400 transition-all hover:border-accent/25 hover:bg-white/[0.04] hover:text-slate-200"
+            >
+              <Zap className="h-3.5 w-3.5 shrink-0 text-accent/60" />
+              <span className="line-clamp-1">{suggestion}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <p className="mt-8 max-w-md text-[10px] leading-5 text-slate-600">
+        AI responses are generated and should be reviewed before use. In preview mode, a configuration notice may appear.
       </p>
     </div>
   )
@@ -796,17 +899,42 @@ function CodeBlock({ children }: { children: React.ReactNode }) {
       // Clipboard permission is browser-controlled.
     }
   }
+  const download = () => {
+    const text = ref.current?.textContent ?? ''
+    const blob = new Blob([text], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'code.txt'
+    a.click()
+    URL.revokeObjectURL(url)
+  }
   return (
-    <div className="group relative">
-      <button
-        type="button"
-        onClick={() => void copy()}
-        className="absolute right-2 top-2 z-10 inline-flex items-center gap-1 rounded-md border border-white/10 bg-ink-900/90 px-2 py-1 text-[10px] text-slate-400 opacity-0 transition-opacity hover:text-white group-hover:opacity-100 focus:opacity-100"
-      >
-        {copied ? <Check className="h-3 w-3 text-accent" /> : <Copy className="h-3 w-3" />}
-        {copied ? 'Copied' : 'Copy code'}
-      </button>
-      <pre ref={ref}>{children}</pre>
+    <div className="group relative my-4">
+      <div className="flex items-center justify-between rounded-t-xl border border-white/10 border-b-0 bg-ink-950/80 px-3 py-1.5">
+        <span className="text-[10px] text-slate-500">Code</span>
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => void copy()}
+            className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[10px] text-slate-400 transition-colors hover:bg-white/5 hover:text-white"
+            title="Copy code"
+          >
+            {copied ? <Check className="h-3 w-3 text-accent" /> : <Copy className="h-3 w-3" />}
+            {copied ? 'Copied' : 'Copy'}
+          </button>
+          <button
+            type="button"
+            onClick={download}
+            className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[10px] text-slate-400 transition-colors hover:bg-white/5 hover:text-white"
+            title="Download"
+          >
+            <Download className="h-3 w-3" />
+            Download
+          </button>
+        </div>
+      </div>
+      <pre ref={ref} className="!mt-0 !rounded-t-none">{children}</pre>
     </div>
   )
 }
