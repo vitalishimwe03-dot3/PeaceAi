@@ -47,7 +47,7 @@ Secure AI platform (React + Vite + TypeScript + Supabase) for AI chat, developme
    ```
 4. Set Edge Function secrets (never in `VITE_*`):
    - **AI:** `AI_API_KEY`, `AI_BASE_URL`, `AI_MODEL` (+ optional premium/embedding vars)
-   - **Payments (Flutterwave):** `FLUTTERWAVE_PUBLIC_KEY`, `FLUTTERWAVE_SECRET_KEY`, `FLUTTERWAVE_SECRET_HASH`, `FLUTTERWAVE_BASE_URL`
+       - **Payments (Flutterwave):** `FLUTTERWAVE_PUBLIC_KEY`, `FLUTTERWAVE_SECRET_KEY`, `FLUTTERWAVE_SECRET_HASH`, `FLUTTERWAVE_BASE_URL`. In Flutterwave enable Rwanda mobile money collections (MTN and Airtel) and set the webhook URL to `https://<project-ref>.supabase.co/functions/v1/payment-webhook`. Test in sandbox first.
    - **Email (Resend):** `RESEND_API_KEY`, `EMAIL_FROM`, `ADMIN_ALERT_EMAIL`
    - **Site/jobs:** `SITE_URL`, `INTERNAL_JOB_SECRET`
 
@@ -58,8 +58,8 @@ Secure AI platform (React + Vite + TypeScript + Supabase) for AI chat, developme
 | `ai-chat` | JWT | AI responses with quota enforcement and knowledge retrieval. |
 | `process-dataset` | JWT/admin (service-internal allowed) | Chunks/indexes uploaded knowledge files into `knowledge_chunks`. |
 | `ingest-knowledge` | JWT | **Self-serve knowledge ingestion**: saves text as a ready knowledge dataset for retrieval. |
-| `create-payment` | JWT | Creates pending payment + Flutterwave checkout (server-verified amounts). |
-| `payment-webhook` | no JWT (signature verified) | Verifies provider webhook and activates entitlements **only after verification** (idempotent). |
+| `create-payment` | JWT | Creates pending payment; supports hosted checkout and Rwanda mobile-money prompts (MTN/Airtel) with server-verified amounts. |
+| `payment-webhook` | no JWT (signature verified) | Verifies `verif-hash`, re-verifies the transaction with Flutterwave, then activates entitlements via `activate_paid_subscription` (idempotent). |
 | `contact-message` | public | Stores contact messages with basic rate limiting; optional Resend notification. |
 | `delete-account` | JWT | Authenticated account deletion (admin workflow excluded). |
 
@@ -72,7 +72,7 @@ Secure AI platform (React + Vite + TypeScript + Supabase) for AI chat, developme
 ## Security notes
 
 - Keep provider/payment/service keys in **server-side** Edge Function secrets only.
-- `payment-webhook` must verify `FLUTTERWAVE_SECRET_HASH` (`verif-hash`) and be idempotent. Never unlock paid features from client-only callbacks.
+- `payment-webhook` must verify `FLUTTERWAVE_SECRET_HASH` (`verif-hash`) and re-verify the transaction with `FLUTTERWAVE_SECRET_KEY` before activation. Never unlock paid features from client-only callbacks. Mobile-money prompts are sent to the user's phone; PeaceAI never asks for or stores wallet PINs.
 - Review CORS, RLS policies, and auth email-confirmation settings before production.
 
 ## Scripts

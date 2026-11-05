@@ -5,11 +5,12 @@
 @layer base {
   /*
    * Design tokens. Components consume the semantic utilities (surface-*,
-   * content-*, field-*, line-*, tint), which resolve to these variables. That
-   * keeps the theme switch purely a data-theme flip on <html>.
+   * content-*, field-*, line-*, tint), which resolve to these variables. The
+   * theme switch is a flip of `data-resolved-theme` on <html>, so no component
+   * needs theme-specific classes for the core palette.
    */
   :root,
-  [data-theme='light'] {
+  [data-resolved-theme='light'] {
     color-scheme: light;
     --ink: 14 9 19;
     --accent: 255 138 76;
@@ -206,11 +207,11 @@
   }
 
   .card-surface {
-    @apply rounded-[1.35rem] border border-line bg-surface-elevated shadow-card dark:bg-surface-elevated/75;
+    @apply rounded-[1.35rem] border border-line bg-surface-elevated shadow-card theme-dark:bg-surface-elevated/75;
   }
 
   .eyebrow {
-    @apply inline-flex items-center gap-2 rounded-full border border-accent/25 bg-accent/[0.09] px-3 py-1 text-xs font-medium uppercase tracking-[0.16em] text-accent-dark dark:text-accent;
+    @apply inline-flex items-center gap-2 rounded-full border border-accent/25 bg-accent/[0.09] px-3 py-1 text-xs font-medium uppercase tracking-[0.16em] text-accent-dark theme-dark:text-accent;
   }
 
   .gradient-text {
@@ -257,13 +258,13 @@
     @apply my-3 list-decimal space-y-1 pl-6;
   }
   .prose-peace a {
-    @apply text-accent-dark underline decoration-accent/30 underline-offset-4 hover:decoration-accent dark:text-accent;
+    @apply text-accent-dark underline decoration-accent/30 underline-offset-4 hover:decoration-accent theme-dark:text-accent;
   }
   .prose-peace blockquote {
     @apply my-4 border-l-2 border-accent/50 bg-accent/[0.04] py-1 pl-4 italic text-content-muted;
   }
   .prose-peace code:not(pre code) {
-    @apply rounded bg-field px-1.5 py-0.5 font-mono text-[0.86em] text-accent-dark dark:text-accent-light;
+    @apply rounded bg-field px-1.5 py-0.5 font-mono text-[0.86em] text-accent-dark theme-dark:text-accent-light;
   }
   .prose-peace pre {
     @apply my-4 overflow-x-auto rounded-xl border border-line bg-surface-sunken p-4 font-mono text-[13px] leading-6;
@@ -296,156 +297,206 @@
   }
 
   /*
-   * Legacy mapper: existing screens paint with white-alpha overlays. In dark
-   * mode these are identical to before; in light mode they become dark-alpha,
-   * so already-built pages inherit light mode without touching every file.
+   * Convenience overrides for pages that still use the original dark-era
+   * utilities (white-alpha fills/borders, the slate text ramp, ink surfaces).
+   * Scoped to the resolved light theme, so they never affect dark mode.
+   *
+   * Prefer the semantic tokens in new code; these exist so existing screens
+   * read correctly in light mode without a per-file rewrite.
    */
-  [data-theme='light'] .bg-white\/\[0\.01\],
-  [data-theme='light'] .bg-white\/\[0\.02\] {
+  [data-resolved-theme='light'] .bg-white\/\[0\.01\],
+  [data-resolved-theme='light'] .bg-white\/\[0\.02\] {
     background-color: rgb(20 16 30 / 0.02);
   }
-  [data-theme='light'] .bg-white\/\[0\.025\],
-  [data-theme='light'] .bg-white\/\[0\.03\] {
+  [data-resolved-theme='light'] .bg-white\/\[0\.025\],
+  [data-resolved-theme='light'] .bg-white\/\[0\.03\] {
     background-color: rgb(20 16 30 / 0.03);
   }
-  [data-theme='light'] .bg-white\/\[0\.035\],
-  [data-theme='light'] .bg-white\/\[0\.04\] {
+  [data-resolved-theme='light'] .bg-white\/\[0\.035\],
+  [data-resolved-theme='light'] .bg-white\/\[0\.04\] {
     background-color: rgb(20 16 30 / 0.04);
   }
-  [data-theme='light'] .bg-white\/5,
-  [data-theme='light'] .bg-white\/\[0\.05\],
-  [data-theme='light'] .bg-white\/\[0\.06\] {
+  [data-resolved-theme='light'] .bg-white\/5,
+  [data-resolved-theme='light'] .bg-white\/\[0\.05\],
+  [data-resolved-theme='light'] .bg-white\/\[0\.06\] {
     background-color: rgb(20 16 30 / 0.055);
   }
-  [data-theme='light'] .bg-white\/10,
-  [data-theme='light'] .bg-white\/\[0\.08\] {
+  [data-resolved-theme='light'] .bg-white\/10,
+  [data-resolved-theme='light'] .bg-white\/\[0\.08\] {
     background-color: rgb(20 16 30 / 0.085);
   }
-  [data-theme='light'] .bg-white\/\[0\.1\] {
+  [data-resolved-theme='light'] .bg-white\/\[0\.1\] {
     background-color: rgb(20 16 30 / 0.1);
   }
-  [data-theme='light'] .bg-white\/20 {
+  [data-resolved-theme='light'] .bg-white\/20 {
     background-color: rgb(20 16 30 / 0.16);
   }
-  [data-theme='light'] .hover\:bg-white\/5:hover,
-  [data-theme='light'] .hover\:bg-white\/\[0\.03\]:hover,
-  [data-theme='light'] .hover\:bg-white\/\[0\.04\]:hover,
-  [data-theme='light'] .hover\:bg-white\/\[0\.05\]:hover,
-  [data-theme='light'] .hover\:bg-white\/\[0\.06\]:hover,
-  [data-theme='light'] .hover\:bg-white\/\[0\.07\]:hover {
+  [data-resolved-theme='light'] .hover\:bg-white\/5:hover,
+  [data-resolved-theme='light'] .hover\:bg-white\/\[0\.03\]:hover,
+  [data-resolved-theme='light'] .hover\:bg-white\/\[0\.04\]:hover,
+  [data-resolved-theme='light'] .hover\:bg-white\/\[0\.05\]:hover,
+  [data-resolved-theme='light'] .hover\:bg-white\/\[0\.06\]:hover,
+  [data-resolved-theme='light'] .hover\:bg-white\/\[0\.07\]:hover {
     background-color: rgb(20 16 30 / 0.06);
   }
-  [data-theme='light'] .hover\:bg-white\/10:hover {
+  [data-resolved-theme='light'] .hover\:bg-white\/10:hover {
     background-color: rgb(20 16 30 / 0.1);
   }
-  [data-theme='light'] .hover\:bg-white\/20:hover {
+  [data-resolved-theme='light'] .hover\:bg-white\/20:hover {
     background-color: rgb(20 16 30 / 0.16);
   }
 
   /* Borders: only the alpha-based lines flip; `border-white` (solid) is intentional. */
-  [data-theme='light'] .border-white\/5,
-  [data-theme='light'] .border-white\/\[0\.04\],
-  [data-theme='light'] .border-white\/\[0\.05\],
-  [data-theme='light'] .border-white\/\[0\.06\],
-  [data-theme='light'] .border-white\/\[0\.07\],
-  [data-theme='light'] .border-white\/\[0\.08\] {
+  [data-resolved-theme='light'] .border-white\/5,
+  [data-resolved-theme='light'] .border-white\/\[0\.04\],
+  [data-resolved-theme='light'] .border-white\/\[0\.05\],
+  [data-resolved-theme='light'] .border-white\/\[0\.06\],
+  [data-resolved-theme='light'] .border-white\/\[0\.07\],
+  [data-resolved-theme='light'] .border-white\/\[0\.08\] {
     border-color: rgb(20 16 30 / 0.07);
   }
-  [data-theme='light'] .border-white\/10,
-  [data-theme='light'] .border-white\/15 {
+  [data-resolved-theme='light'] .border-white\/10,
+  [data-resolved-theme='light'] .border-white\/15 {
     border-color: rgb(20 16 30 / 0.11);
   }
-  [data-theme='light'] .border-white\/20,
-  [data-theme='light'] .border-white\/25 {
+  [data-resolved-theme='light'] .border-white\/20,
+  [data-resolved-theme='light'] .border-white\/25 {
     border-color: rgb(20 16 30 / 0.18);
   }
-  [data-theme='light'] .hover\:border-white\/20:hover,
-  [data-theme='light'] .hover\:border-white\/25:hover {
+  [data-resolved-theme='light'] .hover\:border-white\/20:hover,
+  [data-resolved-theme='light'] .hover\:border-white\/25:hover {
     border-color: rgb(20 16 30 / 0.2);
   }
-  [data-theme='light'] .divide-white\/5 > :not([hidden]) ~ :not([hidden]) {
+  [data-resolved-theme='light'] .divide-white\/5 > :not([hidden]) ~ :not([hidden]) {
     border-color: rgb(20 16 30 / 0.07);
   }
-  [data-theme='light'] .divide-white\/10 > :not([hidden]) ~ :not([hidden]) {
+  [data-resolved-theme='light'] .divide-white\/10 > :not([hidden]) ~ :not([hidden]) {
     border-color: rgb(20 16 30 / 0.11);
   }
 
   /* Text: invert the neutral slate ramp and pure white. */
-  [data-theme='light'] .text-white {
+  [data-resolved-theme='light'] .text-white {
     color: rgb(20 16 30);
   }
-  [data-theme='light'] .hover\:text-white:hover {
+  [data-resolved-theme='light'] .hover\:text-white:hover {
     color: rgb(10 7 16);
   }
-  [data-theme='light'] .text-slate-100,
-  [data-theme='light'] .text-slate-200 {
+  [data-resolved-theme='light'] .text-slate-100,
+  [data-resolved-theme='light'] .text-slate-200 {
     color: rgb(42 36 58);
   }
-  [data-theme='light'] .text-slate-300 {
+  [data-resolved-theme='light'] .text-slate-300 {
     color: rgb(71 63 92);
   }
-  [data-theme='light'] .text-slate-400 {
+  [data-resolved-theme='light'] .text-slate-400 {
     color: rgb(96 87 119);
   }
-  [data-theme='light'] .text-slate-500 {
+  [data-resolved-theme='light'] .text-slate-500 {
     color: rgb(118 108 142);
   }
-  [data-theme='light'] .text-slate-600 {
+  [data-resolved-theme='light'] .text-slate-600 {
     color: rgb(138 128 161);
   }
-  [data-theme='light'] .placeholder\:text-slate-500::placeholder {
+  [data-resolved-theme='light'] .placeholder\:text-slate-500::placeholder {
     color: rgb(138 128 161);
   }
 
-  /* Dark ink surfaces become elevated white surfaces. */
-  [data-theme='light'] .bg-ink-950 {
+  /* Dark ink surfaces (and their alpha variants used for bars/panels) become light. */
+  [data-resolved-theme='light'] .bg-ink-950 {
     background-color: rgb(247 246 250);
   }
-  [data-theme='light'] .bg-ink-900 {
+  [data-resolved-theme='light'] .bg-ink-950\/40 {
+    background-color: rgb(247 246 250 / 0.4);
+  }
+  [data-resolved-theme='light'] .bg-ink-950\/50 {
+    background-color: rgb(247 246 250 / 0.5);
+  }
+  [data-resolved-theme='light'] .bg-ink-950\/60 {
+    background-color: rgb(247 246 250 / 0.6);
+  }
+  [data-resolved-theme='light'] .bg-ink-950\/70 {
+    background-color: rgb(247 246 250 / 0.7);
+  }
+  [data-resolved-theme='light'] .bg-ink-950\/80 {
+    background-color: rgb(247 246 250 / 0.8);
+  }
+  [data-resolved-theme='light'] .bg-ink-900 {
     background-color: #fff;
   }
-  [data-theme='light'] .bg-ink-850,
-  [data-theme='light'] .bg-ink-800 {
+  [data-resolved-theme='light'] .bg-ink-900\/30 {
+    background-color: rgb(255 255 255 / 0.3);
+  }
+  [data-resolved-theme='light'] .bg-ink-900\/40 {
+    background-color: rgb(255 255 255 / 0.45);
+  }
+  [data-resolved-theme='light'] .bg-ink-900\/50 {
+    background-color: rgb(255 255 255 / 0.55);
+  }
+  [data-resolved-theme='light'] .bg-ink-900\/60 {
+    background-color: rgb(255 255 255 / 0.65);
+  }
+  [data-resolved-theme='light'] .bg-ink-900\/70 {
+    background-color: rgb(255 255 255 / 0.75);
+  }
+  [data-resolved-theme='light'] .bg-ink-900\/80 {
+    background-color: rgb(255 255 255 / 0.82);
+  }
+  [data-resolved-theme='light'] .bg-ink-900\/90 {
+    background-color: rgb(255 255 255 / 0.92);
+  }
+  [data-resolved-theme='light'] .bg-ink-900\/95 {
+    background-color: rgb(255 255 255 / 0.95);
+  }
+  [data-resolved-theme='light'] .bg-ink-850,
+  [data-resolved-theme='light'] .bg-ink-800 {
     background-color: rgb(240 238 245);
   }
 
+  /* Violet accent tint: too faint on white, so deepen it in light mode. */
+  [data-resolved-theme='light'] .bg-iris\/10 {
+    background-color: rgb(124 92 240 / 0.14);
+  }
+  [data-resolved-theme='light'] .border-iris\/25 {
+    border-color: rgb(124 92 240 / 0.38);
+  }
+
   /* Coral on white needs more weight for legible contrast. */
-  [data-theme='light'] .text-accent {
+  [data-resolved-theme='light'] .text-accent {
     color: #c2541f;
   }
-  [data-theme='light'] .text-accent-light {
+  [data-resolved-theme='light'] .text-accent-light {
     color: #a8420f;
   }
-  [data-theme='light'] .text-iris-light {
+  [data-resolved-theme='light'] .text-iris-light {
     color: #6d4de0;
   }
 
   /* Status tones */
-  [data-theme='light'] .text-amber-100,
-  [data-theme='light'] .text-amber-200 {
+  [data-resolved-theme='light'] .text-amber-100,
+  [data-resolved-theme='light'] .text-amber-200 {
     color: #854d0e;
   }
-  [data-theme='light'] .text-amber-200\/80,
-  [data-theme='light'] .text-amber-200\/70 {
+  [data-resolved-theme='light'] .text-amber-200\/80,
+  [data-resolved-theme='light'] .text-amber-200\/70 {
     color: rgb(133 77 14 / 0.85);
   }
-  [data-theme='light'] .text-amber-300 {
+  [data-resolved-theme='light'] .text-amber-300 {
     color: #a16207;
   }
-  [data-theme='light'] .text-rose-100\/70,
-  [data-theme='light'] .text-rose-200 {
+  [data-resolved-theme='light'] .text-rose-100\/70,
+  [data-resolved-theme='light'] .text-rose-200 {
     color: #9f1239;
   }
-  [data-theme='light'] .text-rose-300 {
+  [data-resolved-theme='light'] .text-rose-300 {
     color: #be123c;
   }
-  [data-theme='light'] .text-rose-400 {
+  [data-resolved-theme='light'] .text-rose-400 {
     color: #e11d48;
   }
-  [data-theme='light'] .text-violet-300 {
+  [data-resolved-theme='light'] .text-violet-300 {
     color: #6d28d9;
   }
-  [data-theme='light'] .text-sky-300 {
+  [data-resolved-theme='light'] .text-sky-300 {
     color: #0369a1;
   }
 }
@@ -503,52 +554,52 @@
   color: #66bb6a;
 }
 
-[data-theme='light'] .hljs {
+[data-resolved-theme='light'] .hljs {
   color: #24292f;
 }
-[data-theme='light'] .hljs-comment,
-[data-theme='light'] .hljs-quote {
+[data-resolved-theme='light'] .hljs-comment,
+[data-resolved-theme='light'] .hljs-quote {
   color: #6e7781;
 }
-[data-theme='light'] .hljs-keyword,
-[data-theme='light'] .hljs-selector-tag,
-[data-theme='light'] .hljs-literal {
+[data-resolved-theme='light'] .hljs-keyword,
+[data-resolved-theme='light'] .hljs-selector-tag,
+[data-resolved-theme='light'] .hljs-literal {
   color: #7c3aed;
 }
-[data-theme='light'] .hljs-string,
-[data-theme='light'] .hljs-doctag {
+[data-resolved-theme='light'] .hljs-string,
+[data-resolved-theme='light'] .hljs-doctag {
   color: #0f766e;
 }
-[data-theme='light'] .hljs-number,
-[data-theme='light'] .hljs-symbol,
-[data-theme='light'] .hljs-bullet {
+[data-resolved-theme='light'] .hljs-number,
+[data-resolved-theme='light'] .hljs-symbol,
+[data-resolved-theme='light'] .hljs-bullet {
   color: #c2410c;
 }
-[data-theme='light'] .hljs-title,
-[data-theme='light'] .hljs-section,
-[data-theme='light'] .hljs-function .hljs-title {
+[data-resolved-theme='light'] .hljs-title,
+[data-resolved-theme='light'] .hljs-section,
+[data-resolved-theme='light'] .hljs-function .hljs-title {
   color: #1d4ed8;
 }
-[data-theme='light'] .hljs-attr,
-[data-theme='light'] .hljs-attribute,
-[data-theme='light'] .hljs-variable {
+[data-resolved-theme='light'] .hljs-attr,
+[data-resolved-theme='light'] .hljs-attribute,
+[data-resolved-theme='light'] .hljs-variable {
   color: #a16207;
 }
-[data-theme='light'] .hljs-built_in,
-[data-theme='light'] .hljs-type {
+[data-resolved-theme='light'] .hljs-built_in,
+[data-resolved-theme='light'] .hljs-type {
   color: #0e7490;
 }
-[data-theme='light'] .hljs-tag,
-[data-theme='light'] .hljs-name {
+[data-resolved-theme='light'] .hljs-tag,
+[data-resolved-theme='light'] .hljs-name {
   color: #1d4ed8;
 }
-[data-theme='light'] .hljs-meta {
+[data-resolved-theme='light'] .hljs-meta {
   color: #57606a;
 }
-[data-theme='light'] .hljs-deletion {
+[data-resolved-theme='light'] .hljs-deletion {
   color: #b91c1c;
 }
-[data-theme='light'] .hljs-addition {
+[data-resolved-theme='light'] .hljs-addition {
   color: #15803d;
 }
 
@@ -561,39 +612,4 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-}
-
-/*
- * Theme ordering safety net.
- *
- * `data-theme` on <html> holds the user's preference (light | dark | system).
- * Tailwind emits each `dark:` utility in two blocks: `[data-theme='dark'] …`
- * and `@media (prefers-color-scheme: dark) { [data-theme='system'] … }`.
- * When the OS is dark, the media block can land after our `[data-theme='light']`
- * overrides in the utilities layer and outrank them. These rules live after
- * `@tailwind utilities`, so they win by source order without `!important`.
- *
- * Exceptions that are intentionally NOT reset here: accents that should stay
- * dark on a light surface (primary buttons, coral badges).
- */
-[data-theme='light'] .bg-surface-elevated {
-  background-color: rgb(var(--surface-elevated) / 0.85);
-}
-[data-theme='light'] .text-accent {
-  color: #c2541f;
-}
-[data-theme='light'] .text-amber-300 {
-  color: #a16207;
-}
-[data-theme='light'] .text-rose-300 {
-  color: #be123c;
-}
-[data-theme='light'] .text-violet-300 {
-  color: #6d28d9;
-}
-[data-theme='light'] .text-iris-light {
-  color: #6d4de0;
-}
-[data-theme='light'] .text-sky-300 {
-  color: #0369a1;
 }

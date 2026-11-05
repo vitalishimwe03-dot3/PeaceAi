@@ -36,10 +36,10 @@ export function StatCard({
   tone?: 'accent' | 'blue' | 'amber' | 'violet'
 }) {
   const tones = {
-    accent: 'bg-accent/10 text-accent-dark dark:text-accent',
-    blue: 'bg-sky-400/10 text-sky-700 dark:text-sky-300',
-    amber: 'bg-amber-400/10 text-amber-700 dark:text-amber-300',
-    violet: 'bg-violet-400/10 text-violet-700 dark:text-violet-300',
+    accent: 'bg-accent/10 text-accent-dark theme-dark:text-accent',
+    blue: 'bg-sky-400/10 text-sky-700 theme-dark:text-sky-300',
+    amber: 'bg-amber-400/10 text-amber-700 theme-dark:text-amber-300',
+    violet: 'bg-violet-400/10 text-violet-700 theme-dark:text-violet-300',
   }
   const iconNode =
     typeof icon === 'function'

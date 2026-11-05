@@ -12,7 +12,7 @@ const variants: Record<Variant, string> = {
   outline: 'border border-line-strong bg-field text-content-strong hover:border-line-strong hover:bg-field-hover',
   ghost: 'text-content-muted hover:bg-field-hover hover:text-content-strong',
   danger: 'bg-rose-500/90 text-white hover:bg-rose-500',
-  soft: 'bg-accent/10 text-accent-dark hover:bg-accent/15 dark:text-accent',
+  soft: 'bg-accent/10 text-accent-dark hover:bg-accent/15 theme-dark:text-accent',
 }
 
 const sizes: Record<Size, string> = {

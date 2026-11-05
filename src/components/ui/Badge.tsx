@@ -5,11 +5,11 @@ type Tone = 'neutral' | 'accent' | 'blue' | 'amber' | 'rose' | 'violet'
 
 const tones: Record<Tone, string> = {
   neutral: 'border-line bg-field text-content-muted',
-  accent: 'border-accent/20 bg-accent/10 text-accent-dark dark:text-accent',
-  blue: 'border-iris/25 bg-iris/10 text-iris-dark dark:text-iris-light',
-  amber: 'border-amber-400/20 bg-amber-400/10 text-amber-700 dark:text-amber-300',
-  rose: 'border-rose-400/20 bg-rose-400/10 text-rose-600 dark:text-rose-300',
-  violet: 'border-violet-400/20 bg-violet-400/10 text-violet-700 dark:text-violet-300',
+  accent: 'border-accent/20 bg-accent/10 text-accent-dark theme-dark:text-accent',
+  blue: 'border-iris/25 bg-iris/10 text-iris-dark theme-dark:text-iris-light',
+  amber: 'border-amber-400/20 bg-amber-400/10 text-amber-700 theme-dark:text-amber-300',
+  rose: 'border-rose-400/20 bg-rose-400/10 text-rose-600 theme-dark:text-rose-300',
+  violet: 'border-violet-400/20 bg-violet-400/10 text-violet-700 theme-dark:text-violet-300',
 }
 
 export function Badge({

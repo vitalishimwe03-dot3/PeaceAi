@@ -1,24 +1,28 @@
 import plugin from 'tailwindcss/plugin'
-import type { Config } from 'tailwindcss'
-import type { PluginAPI } from 'tailwindcss/types/config'
 
 /**
- * The app historically used `dark:` for OS preference while being dark-only.
- * We drive theming from `data-theme` on `<html>`, so `dark:` must follow that
- * attribute instead of `.dark` or the raw media query.
+ * `dark:` variant keyed to the theme preference instead of the OS.
+ *
+ * The app stores the preference in `data-theme` and the concrete mode in
+ * `data-resolved-theme` (both on <html>; see src/contexts/ThemeContext.tsx).
+ *
+ * Tailwind's built-in `dark` variant cannot be replaced from a plugin — its
+ * handler always runs last and wins — so we register `theme-dark` instead.
+ * `darkMode` is disabled below so the built-in `dark:` never compiles; that way
+ * any stray `dark:` class is harmless rather than silently following the OS.
  */
-const themeVariant = plugin(({ addVariant }: PluginAPI) => {
-  addVariant('dark', [
-    '[data-theme="dark"] &',
-    ':where([data-theme="dark"]) &',
-    '@media (prefers-color-scheme: dark) { :where([data-theme="system"]) & }',
-  ])
+const themeDark = plugin(({ addVariant }) => {
+  addVariant('theme-dark', [":where([data-resolved-theme='dark']) &"])
 })
 
 export default {
-  // Theme is driven by the `themeVariant` plugin below (data-theme on <html>),
-  // so Tailwind's built-in `darkMode` strategy is intentionally not set.
-  content: ['./index.html', './src/**/*.{ts,tsx}'],
+  content: [
+    './index.html',
+    './src/**/*.{ts,tsx}',
+    // Variants are scanned as plain strings, so map the semantic of `dark:`
+    // written in source to the concrete `theme-dark:` utility below.
+    { raw: 'theme-dark', extension: 'txt' },
+  ],
   theme: {
     extend: {
       colors: {
@@ -104,5 +108,5 @@ export default {
       },
     },
   },
-  plugins: [themeVariant],
+  plugins: [themeDark],
 } satisfies Config

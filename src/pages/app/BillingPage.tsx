@@ -9,10 +9,12 @@ import {
   ReceiptText,
   RefreshCw,
   ShieldCheck,
+  Smartphone,
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useToast } from '@/contexts/ToastContext'
 import { PageHeader } from '@/components/layout/PageHeader'
+import { MobileMoneyCheckoutDialog, type MobileMoneyCheckoutSubmit } from '@/components/billing/MobileMoneyCheckoutDialog'
 import { Badge, statusTone } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { ConfirmDialog } from '@/components/ui/Modal'
@@ -38,6 +40,8 @@ export function BillingPage() {
   const [loading, setLoading] = useState(true)
   const [period, setPeriod] = useState<'month' | 'year'>('month')
   const [checkoutPlanId, setCheckoutPlanId] = useState<string | null>(null)
+  const [checkoutPlan, setCheckoutPlan] = useState<Plan | null>(null)
+  const [mobileMoneyNotice, setMobileMoneyNotice] = useState('')
   const [cancelOpen, setCancelOpen] = useState(false)
   const [updating, setUpdating] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
@@ -84,21 +88,38 @@ export function BillingPage() {
 
   if (!user) return null
 
-  const beginCheckout = async (plan: Plan) => {
+  const beginCheckout = (plan: Plan) => {
     if (plan.price_rwf === 0 && period === 'month') {
       toast({ title: 'Free plan', description: 'Contact an administrator to move to the Free plan. Paid features remain active until the paid period ends.', tone: 'info' })
       return
     }
+    setCheckoutPlan(plan)
+  }
+
+  const submitCheckout = async (details: MobileMoneyCheckoutSubmit) => {
+    const plan = checkoutPlan
+    if (!plan) return
     setCheckoutPlanId(plan.id)
     try {
-      const { checkoutUrl } = await startCheckout(plan.id, period)
-      window.location.assign(checkoutUrl)
+      const result = await startCheckout(plan.id, period, details)
+      const redirectUrl = result.checkoutUrl ?? result.authorizationUrl ?? null
+      if (redirectUrl) {
+        window.location.assign(redirectUrl)
+        return
+      }
+      setMobileMoneyNotice(
+        result.message ||
+          'A payment request has been sent to your phone. Approve it with your mobile-money PIN. Your plan activates after the payment is verified.',
+      )
+      setCheckoutPlan(null)
+      toast({ title: 'Payment request sent', description: 'Approve the prompt on your phone.', tone: 'info' })
     } catch (err) {
       toast({
         title: 'Checkout is not available',
         description: getErrorMessage(err, 'Configure the payment provider before accepting payments.'),
         tone: 'error',
       })
+    } finally {
       setCheckoutPlanId(null)
     }
   }
@@ -165,6 +186,14 @@ export function BillingPage() {
         }
       />
 
+      {mobileMoneyNotice ? (
+        <div className="mb-5 flex items-start gap-3 rounded-xl border border-emerald-400/20 bg-emerald-400/[0.05] p-4">
+          <Smartphone className="mt-0.5 h-4 w-4 shrink-0 text-emerald-300" />
+          <p className="flex-1 text-xs leading-5 text-emerald-100/80">{mobileMoneyNotice}</p>
+          <button type="button" onClick={() => setMobileMoneyNotice('')} className="text-[11px] text-emerald-300 hover:underline">Dismiss</button>
+        </div>
+      ) : null}
+
       {checkoutNotice ? (
         <div className="mb-5 flex items-start gap-3 rounded-xl border border-sky-400/20 bg-sky-400/[0.05] p-4">
           <Info className="mt-0.5 h-4 w-4 shrink-0 text-sky-300" />
@@ -178,7 +207,7 @@ export function BillingPage() {
         <p className="mt-1.5 text-[11px] leading-5 text-amber-100/70">
           {isPreview
             ? 'Preview mode: no payment provider is connected. Checkout buttons explain what must be configured and never simulate a charge.'
-            : 'Checkout is provided by Flutterwave only when the owner’s merchant credentials are configured in Supabase Edge Function secrets. Card and mobile-money availability is determined by the provider. PeaceAI does not receive or store card numbers.'}
+            : 'Checkout is provided by Flutterwave only when the owner’s merchant credentials are configured in Supabase Edge Function secrets. You can pay by hosted checkout or by MTN MoMo / Airtel Money with your phone number; availability is determined by the provider. PeaceAI does not receive or store card numbers or wallet PINs.'}
         </p>
       </div>
 
@@ -299,9 +328,9 @@ export function BillingPage() {
                   <Button
                     className="mt-5 w-full"
                     variant={isCurrent ? 'outline' : 'primary'}
-                    disabled={isCurrent || checkingOut(plan, checkoutPlanId)}
+                    disabled={isCurrent || checkoutPlanId !== null}
                     loading={checkoutPlanId === plan.id}
-                    onClick={() => void beginCheckout(plan)}
+                    onClick={() => beginCheckout(plan)}
                   >
                     {isCurrent ? 'Current plan' : plan.price_rwf === 0 ? 'Contact support' : <>Choose {plan.name} <ArrowUpRight className="h-4 w-4" /></>}
                   </Button>
@@ -365,6 +394,17 @@ export function BillingPage() {
         </>
       )}
 
+      <MobileMoneyCheckoutDialog
+        open={checkoutPlan !== null}
+        onClose={() => {
+          if (checkoutPlanId) return
+          setCheckoutPlan(null)
+        }}
+        plan={checkoutPlan}
+        period={period}
+        busy={checkoutPlanId !== null}
+        onSubmit={submitCheckout}
+      />
       <ConfirmDialog
         open={cancelOpen}
         onClose={() => setCancelOpen(false)}
@@ -379,6 +419,3 @@ export function BillingPage() {
   )
 }
 
-function checkingOut(_plan: Plan, planId: string | null) {
-  return planId !== null
-}

@@ -32,9 +32,9 @@ const icons = {
 }
 
 const tones = {
-  success: 'border-accent/25 text-accent-dark dark:text-accent',
-  error: 'border-rose-400/25 text-rose-600 dark:text-rose-300',
-  info: 'border-sky-400/25 text-sky-700 dark:text-sky-300',
+  success: 'border-accent/25 text-accent-dark theme-dark:text-accent',
+  error: 'border-rose-400/25 text-rose-600 theme-dark:text-rose-300',
+  info: 'border-sky-400/25 text-sky-700 theme-dark:text-sky-300',
 }
 
 export function ToastProvider({ children }: { children: ReactNode }) {

@@ -183,22 +183,52 @@ export async function listPayments(userId: string): Promise<Payment[]> {
   return (data ?? []) as Payment[]
 }
 
+export type CheckoutOptions = {
+  paymentMethod?: 'checkout' | 'mobile_money'
+  phoneNumber?: string
+  network?: 'MTN' | 'AIRTEL'
+}
+
+export type CheckoutResult = {
+  checkoutUrl?: string
+  authorizationUrl?: string | null
+  txRef: string
+  status?: string
+  message?: string
+  mode?: string | null
+}
+
 export async function startCheckout(
   planId: string,
   period: 'month' | 'year',
-): Promise<{ checkoutUrl: string }> {
+  options: CheckoutOptions = {},
+): Promise<CheckoutResult> {
   if (!isSupabaseConfigured) {
     throw new Error(
       'Payments are not configured in preview mode. Configure Supabase and the Flutterwave merchant account before accepting payments.',
     )
   }
+  const paymentMethod = options.paymentMethod ?? 'checkout'
   const { data, error } = await client().functions.invoke('create-payment', {
-    body: { planId, period },
+    body: {
+      planId,
+      billingPeriod: period,
+      paymentMethod,
+      phoneNumber: options.phoneNumber,
+      network: options.network,
+    },
   })
   if (error) throw new Error(error.message || 'Could not start checkout.')
-  const checkoutUrl = (data as { checkout_url?: string } | null)?.checkout_url
-  if (!checkoutUrl) throw new Error('The payment provider did not return a checkout URL.')
-  return { checkoutUrl }
+  const result = data as
+    | (CheckoutResult & { error?: string })
+    | null
+  if (result?.error) throw new Error(result.error)
+  if (paymentMethod === 'mobile_money') {
+    if (!result?.txRef) throw new Error('The payment provider did not confirm the payment request.')
+    return result
+  }
+  if (!result?.checkoutUrl) throw new Error('The payment provider did not return a checkout URL.')
+  return { checkoutUrl: result.checkoutUrl, txRef: result.txRef ?? '' }
 }
 
 export async function setSubscriptionCancellation(

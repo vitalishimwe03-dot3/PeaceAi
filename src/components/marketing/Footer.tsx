@@ -12,6 +12,7 @@ const columns = [
       { label: 'AI Development', to: '/development' },
       { label: 'Cybersecurity', to: '/cybersecurity' },
       { label: 'Services', to: '/services' },
+      { label: 'Project Estimator', to: '/estimate' },
       { label: 'Pricing', to: '/pricing' },
     ],
   },

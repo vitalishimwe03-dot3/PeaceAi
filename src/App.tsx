@@ -18,6 +18,7 @@ import { CybersecurityPage } from '@/pages/public/CybersecurityPage'
 import { ServicesPage } from '@/pages/public/ServicesPage'
 import { ServiceDetailPage } from '@/pages/public/ServiceDetailPage'
 import { PricingPage } from '@/pages/public/PricingPage'
+import { EstimatePage } from '@/pages/public/EstimatePage'
 import { AboutPage } from '@/pages/public/AboutPage'
 import { ContactPage } from '@/pages/public/ContactPage'
 import { FaqPage } from '@/pages/public/FaqPage'
@@ -74,6 +75,7 @@ export default function App() {
           <Route path="/services" element={<ServicesPage />} />
           <Route path="/services/:slug" element={<ServiceDetailPage />} />
           <Route path="/pricing" element={<PricingPage />} />
+          <Route path="/estimate" element={<EstimatePage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/faq" element={<FaqPage />} />

@@ -3,12 +3,12 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Check, HelpCircle, Minus, ShieldCheck } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useToast } from '@/contexts/ToastContext'
+import { MobileMoneyCheckoutDialog, type MobileMoneyCheckoutSubmit } from '@/components/billing/MobileMoneyCheckoutDialog'
 import { PageHero, SectionHeading } from '@/components/marketing/PageHero'
 import { Badge } from '@/components/ui/Badge'
 import { Button, buttonStyles } from '@/components/ui/Button'
-import { listPlans } from '@/lib/repository'
+import { listPlans, startCheckout } from '@/lib/repository'
 import { fallbackPlans } from '@/lib/catalog'
-import { invokeFunction } from '@/lib/supabase'
 import { cn, formatRwf, getErrorMessage } from '@/lib/utils'
 import type { Plan } from '@/types/domain'
 
@@ -16,6 +16,7 @@ export function PricingPage() {
   const [period, setPeriod] = useState<'monthly' | 'annual'>('monthly')
   const [plans, setPlans] = useState<Plan[]>(fallbackPlans)
   const [busy, setBusy] = useState<string | null>(null)
+  const [checkoutPlan, setCheckoutPlan] = useState<Plan | null>(null)
   const { user, configured } = useAuth()
   const { toast } = useToast()
   const navigate = useNavigate()
@@ -24,7 +25,7 @@ export function PricingPage() {
     void listPlans().then(setPlans).catch(() => undefined)
   }, [])
 
-  const choosePlan = async (plan: Plan) => {
+  const choosePlan = (plan: Plan) => {
     if (!user) {
       navigate(`/signup?next=/pricing&plan=${plan.slug}`)
       return
@@ -41,16 +42,31 @@ export function PricingPage() {
       })
       return
     }
-    setBusy(plan.id)
+    setCheckoutPlan(plan)
+  }
+
+  const submitPlanCheckout = async (details: MobileMoneyCheckoutSubmit) => {
+    if (!checkoutPlan) return
+    setBusy(checkoutPlan.id)
     try {
-      const result = await invokeFunction<{ checkoutUrl?: string; error?: string; message?: string }>(
-        'create-payment',
-        { planSlug: plan.slug, billingPeriod: period === 'annual' ? 'year' : 'month' },
+      const result = await startCheckout(
+        checkoutPlan.id,
+        period === 'annual' ? 'year' : 'month',
+        details,
       )
-      if (!result.checkoutUrl) {
-        throw new Error(result.message || result.error || 'The payment provider did not return a checkout URL.')
+      const redirectUrl = result.checkoutUrl ?? result.authorizationUrl ?? null
+      if (redirectUrl) {
+        window.location.assign(redirectUrl)
+        return
       }
-      window.location.assign(result.checkoutUrl)
+      toast({
+        title: 'Payment request sent',
+        description:
+          result.message ||
+          'Approve the prompt on your phone. Your plan activates after the payment is verified.',
+        tone: 'info',
+      })
+      setCheckoutPlan(null)
     } catch (error) {
       toast({ title: 'Checkout could not start', description: getErrorMessage(error), tone: 'error' })
     } finally {
@@ -142,7 +158,7 @@ export function PricingPage() {
                 <Button
                   variant={featured ? 'primary' : 'outline'}
                   className="mt-6 w-full"
-                  onClick={() => void choosePlan(plan)}
+                  onClick={() => choosePlan(plan)}
                   loading={busy === plan.id}
                 >
                   {plan.price_rwf === 0 ? (user ? 'Current free plan' : 'Start free') : user ? `Choose ${plan.name}` : `Start with ${plan.name}`}
@@ -151,7 +167,7 @@ export function PricingPage() {
                   {plan.price_rwf === 0
                     ? 'No card required'
                     : configured
-                      ? 'Secure checkout via configured provider'
+                      ? 'MTN MoMo / Airtel Money or hosted checkout'
                       : 'Checkout requires payment configuration'}
                 </p>
               </div>
@@ -252,6 +268,17 @@ export function PricingPage() {
           </Link>
         </div>
       </section>
+      <MobileMoneyCheckoutDialog
+        open={checkoutPlan !== null}
+        onClose={() => {
+          if (busy) return
+          setCheckoutPlan(null)
+        }}
+        plan={checkoutPlan}
+        period={period === 'annual' ? 'year' : 'month'}
+        busy={busy !== null}
+        onSubmit={submitPlanCheckout}
+      />
     </>
   )
 }
