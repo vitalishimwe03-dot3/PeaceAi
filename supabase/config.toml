@@ -1,5 +1,5 @@
-# Replace project_id with the Supabase project reference before linking.
-project_id = "peaceai"
+# Supabase project reference (found in the dashboard URL / project settings).
+project_id = "gawowynnvqiqzpuqrxyg"
 
 [api]
 enabled = true
@@ -73,3 +73,6 @@ enabled = false
 [edge_runtime]
 enabled = true
 policy = "oneshot"
+
+[functions.ingest-knowledge]
+verify_jwt = true

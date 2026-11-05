@@ -14,6 +14,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { Logo } from '@/components/ui/Logo'
 import { Avatar } from '@/components/ui/Avatar'
 import { Button, buttonStyles } from '@/components/ui/Button'
+import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { cn } from '@/lib/utils'
 
 const navItems = [
@@ -87,6 +88,7 @@ export function Header() {
         </nav>
 
         <div className="hidden items-center gap-2 xl:flex">
+          <ThemeToggle showSystem />
           {user ? (
             <>
               <Link to="/app" className={buttonStyles({ variant: 'outline', size: 'sm' })}>
@@ -143,15 +145,18 @@ export function Header() {
           )}
         </div>
 
-        <button
-          type="button"
-          onClick={() => setMobileOpen((open) => !open)}
-          className="rounded-lg p-2 text-slate-300 hover:bg-white/5 hover:text-white focus-ring xl:hidden"
-          aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-          aria-expanded={mobileOpen}
-        >
-          {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
+        <div className="flex items-center gap-1 xl:hidden">
+          <ThemeToggle showSystem />
+          <button
+            type="button"
+            onClick={() => setMobileOpen((open) => !open)}
+            className="rounded-lg p-2 text-slate-300 hover:bg-white/5 hover:text-white focus-ring"
+            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileOpen}
+          >
+            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
         </div>
       </div>
 

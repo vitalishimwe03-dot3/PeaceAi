@@ -50,12 +50,23 @@ begin
   end if;
 
   update public.profiles
-  set full_name = case when p_patch ? 'full_name' then nullif(p_patch ->> 'full_name', '') else full_name end,
+  set full_name = case when p_patch ? 'full_name' then nullif(trim(p_patch ->> 'full_name'), '') else full_name end,
       role = v_role,
       status = v_status,
       storage_quota_bytes = v_quota,
       updated_at = now()
   where id = p_user_id;
+
+  -- Suspending bans the account in Supabase Auth; reactivating restores it.
+  if v_status = 'suspended' then
+    update auth.users
+    set banned_until = now() + interval '100 years'
+    where id = p_user_id;
+  elsif v_status = 'active' then
+    update auth.users
+    set banned_until = null
+    where id = p_user_id;
+  end if;
 end;
 $$;
 
@@ -261,7 +272,7 @@ $$;
 revoke all on function public.finish_ai_request(uuid, integer, integer) from public, anon, authenticated;
 grant execute on function public.finish_ai_request(uuid, integer, integer) to service_role;
 
-create or replace function public.match_knowledge_chunks(p_query text, p_limit integer default 5)
+create or replace function public.match_knowledge_chunks(p_query text, p_match_count integer default 5)
 returns table (
   chunk_id uuid,
   dataset_id uuid,
@@ -282,7 +293,7 @@ as $$
     and nullif(trim(p_query), '') is not null
     and c.search_vector @@ plainto_tsquery('english', p_query)
   order by rank desc, c.created_at desc
-  limit greatest(1, least(coalesce(p_limit, 5), 10));
+  limit greatest(1, least(coalesce(p_match_count, 5), 10));
 $$;
 
 revoke all on function public.match_knowledge_chunks(text, integer) from public, anon, authenticated;

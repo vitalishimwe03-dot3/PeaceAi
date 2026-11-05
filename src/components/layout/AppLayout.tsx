@@ -23,6 +23,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { Logo } from '@/components/ui/Logo'
 import { Avatar } from '@/components/ui/Avatar'
 import { Badge } from '@/components/ui/Badge'
+import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { cn } from '@/lib/utils'
 
 const userNav = [
@@ -160,6 +161,7 @@ export function AppLayout() {
               <Badge tone="accent" className="hidden sm:inline-flex">
                 {isPreview ? 'Preview' : user.profile.status}
               </Badge>
+              <ThemeToggle showSystem />
               <Link
                 to="/app/usage"
                 className="relative rounded-lg p-2 text-slate-400 hover:bg-white/5 hover:text-white"

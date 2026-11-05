@@ -3,14 +3,128 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
+  /*
+   * Design tokens. Components consume the semantic utilities (surface-*,
+   * content-*, field-*, line-*, tint), which resolve to these variables. That
+   * keeps the theme switch purely a data-theme flip on <html>.
+   */
+  :root,
+  [data-theme='light'] {
+    color-scheme: light;
+    --ink: 14 9 19;
+    --accent: 255 138 76;
+
+    /* surfaces */
+    --surface-page: 247 246 250;
+    --surface-elevated: 255 255 255;
+    --surface-sunken: 240 238 245;
+    --surface-floating: 255 255 255;
+
+    /* text */
+    --content: 16 12 26;
+    --content-muted: 79 71 100;
+    --content-subtle: 110 100 135;
+    --content-faint: 140 130 163;
+    --content-strong: 10 7 16;
+
+    /* borders (alpha values, so they read correctly on elevated surfaces) */
+    --line: 16 12 26 / 0.12;
+    --line-strong: 16 12 26 / 0.2;
+    --line-subtle: 16 12 26 / 0.07;
+
+    /* neutral fills (hover states, chips, skeletons) */
+    --field: 16 12 26 / 0.045;
+    --field-hover: 16 12 26 / 0.08;
+    --field-active: 16 12 26 / 0.12;
+
+    /* page-level wash */
+    --tint: 20 16 30 / 0.035;
+    --scrollbar: 148 163 184 / 0.45;
+    --scrollbar-hover: 148 163 184 / 0.7;
+    --selection: 255 138 76 / 0.22;
+
+    --body-glow-1: rgba(255, 138, 76, 0.10);
+    --body-glow-2: rgba(167, 139, 250, 0.10);
+    --body-glow-3: rgba(255, 138, 76, 0.04);
+  }
+
+  [data-theme='dark'] {
     color-scheme: dark;
     --ink: 14 9 19;
     --accent: 255 138 76;
+
+    --surface-page: 14 9 19;
+    --surface-elevated: 21 16 32;
+    --surface-sunken: 10 6 15;
+    --surface-floating: 21 16 32;
+
+    --content: 248 245 255;
+    --content-muted: 184 175 203;
+    --content-subtle: 154 143 181;
+    --content-faint: 124 114 150;
+    --content-strong: 255 255 255;
+
+    --line: 255 255 255 / 0.10;
+    --line-strong: 255 255 255 / 0.20;
+    --line-subtle: 255 255 255 / 0.06;
+
+    --field: 255 255 255 / 0.04;
+    --field-hover: 255 255 255 / 0.07;
+    --field-active: 255 255 255 / 0.11;
+
+    --tint: 255 255 255 / 0.035;
+    --scrollbar: 148 163 184 / 0.2;
+    --scrollbar-hover: 148 163 184 / 0.35;
+    --selection: 255 138 76 / 0.3;
+
+    --body-glow-1: rgba(255, 138 76, 0.14);
+    --body-glow-2: rgba(167, 139, 250, 0.12);
+    --body-glow-3: rgba(255, 138, 76, 0.06);
+  }
+
+  /*
+   * The `dark:` utilities resolve to the OS preference while the preference is
+   * `system`, so the tokens must follow the same rule or surfaces and text
+   * would disagree. Declared after the light defaults so it can override them.
+   */
+  @media (prefers-color-scheme: dark) {
+    [data-theme='system'] {
+      color-scheme: dark;
+      --ink: 14 9 19;
+      --accent: 255 138 76;
+
+      --surface-page: 14 9 19;
+      --surface-elevated: 21 16 32;
+      --surface-sunken: 10 6 15;
+      --surface-floating: 21 16 32;
+
+      --content: 248 245 255;
+      --content-muted: 184 175 203;
+      --content-subtle: 154 143 181;
+      --content-faint: 124 114 150;
+      --content-strong: 255 255 255;
+
+      --line: 255 255 255 / 0.10;
+      --line-strong: 255 255 255 / 0.20;
+      --line-subtle: 255 255 255 / 0.06;
+
+      --field: 255 255 255 / 0.04;
+      --field-hover: 255 255 255 / 0.07;
+      --field-active: 255 255 255 / 0.11;
+
+      --tint: 255 255 255 / 0.035;
+      --scrollbar: 148 163 184 / 0.2;
+      --scrollbar-hover: 148 163 184 / 0.35;
+      --selection: 255 138 76 / 0.3;
+
+      --body-glow-1: rgba(255, 138, 76, 0.14);
+      --body-glow-2: rgba(167, 139, 250, 0.12);
+      --body-glow-3: rgba(255, 138, 76, 0.06);
+    }
   }
 
   * {
-    @apply border-white/10;
+    @apply border-line;
   }
 
   html {
@@ -18,18 +132,18 @@
   }
 
   body {
-    @apply bg-ink-950 font-sans text-slate-200 antialiased;
+    @apply bg-surface-page font-sans text-content antialiased;
     min-width: 320px;
     background-image:
-      radial-gradient(ellipse 70% 45% at 12% -10%, rgba(255, 138, 76, 0.14), transparent),
-      radial-gradient(ellipse 45% 40% at 92% 4%, rgba(167, 139, 250, 0.12), transparent),
-      radial-gradient(ellipse 60% 40% at 50% 110%, rgba(255, 138, 76, 0.06), transparent);
+      radial-gradient(ellipse 70% 45% at 12% -10%, var(--body-glow-1), transparent),
+      radial-gradient(ellipse 45% 40% at 92% 4%, var(--body-glow-2), transparent),
+      radial-gradient(ellipse 60% 40% at 50% 110%, var(--body-glow-3), transparent);
     background-attachment: fixed;
   }
 
   ::selection {
-    background: rgba(255, 138, 76, 0.3);
-    color: #fff;
+    background: rgb(var(--selection));
+    color: rgb(var(--content-strong));
   }
 
   :focus-visible {
@@ -41,7 +155,7 @@
   h2,
   h3,
   h4 {
-    @apply font-display tracking-tight text-white;
+    @apply font-display tracking-tight text-content-strong;
     text-wrap: balance;
   }
 
@@ -70,14 +184,14 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background: rgba(148, 163, 184, 0.2);
+    background: rgb(var(--scrollbar));
     border-radius: 999px;
     border: 2px solid transparent;
     background-clip: content-box;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(148, 163, 184, 0.35);
+    background: rgb(var(--scrollbar-hover));
     background-clip: content-box;
   }
 }
@@ -88,41 +202,41 @@
   }
 
   .glass {
-    @apply border border-white/10 bg-white/[0.035] backdrop-blur-md;
+    @apply border border-line bg-surface-elevated/60 backdrop-blur-md;
   }
 
   .card-surface {
-    @apply rounded-[1.35rem] border border-white/10 bg-ink-900/75 shadow-card;
+    @apply rounded-[1.35rem] border border-line bg-surface-elevated shadow-card dark:bg-surface-elevated/75;
   }
 
   .eyebrow {
-    @apply inline-flex items-center gap-2 rounded-full border border-accent/25 bg-accent/[0.09] px-3 py-1 text-xs font-medium uppercase tracking-[0.16em] text-accent;
+    @apply inline-flex items-center gap-2 rounded-full border border-accent/25 bg-accent/[0.09] px-3 py-1 text-xs font-medium uppercase tracking-[0.16em] text-accent-dark dark:text-accent;
   }
 
   .gradient-text {
-    @apply bg-gradient-to-r from-white via-white to-slate-400 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-content-strong via-content-strong to-content-subtle bg-clip-text text-transparent;
   }
 
   .grid-bg {
     background-image:
-      linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+      linear-gradient(to right, rgb(var(--tint)) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(var(--tint)) 1px, transparent 1px);
     background-size: 56px 56px;
     mask-image: linear-gradient(to bottom, black 20%, transparent 85%);
   }
 
   .focus-ring {
-    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-ink-950;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface-page;
   }
 
   .prose-peace {
-    @apply text-[15px] leading-7 text-slate-300;
+    @apply text-[15px] leading-7 text-content-muted;
   }
   .prose-peace h1,
   .prose-peace h2,
   .prose-peace h3,
   .prose-peace h4 {
-    @apply mb-2 mt-6 font-display font-semibold text-white;
+    @apply mb-2 mt-6 font-display font-semibold text-content-strong;
   }
   .prose-peace h1 {
     @apply text-2xl;
@@ -143,28 +257,28 @@
     @apply my-3 list-decimal space-y-1 pl-6;
   }
   .prose-peace a {
-    @apply text-accent underline decoration-accent/30 underline-offset-4 hover:decoration-accent;
+    @apply text-accent-dark underline decoration-accent/30 underline-offset-4 hover:decoration-accent dark:text-accent;
   }
   .prose-peace blockquote {
-    @apply my-4 border-l-2 border-accent/50 bg-accent/[0.04] py-1 pl-4 italic text-slate-300;
+    @apply my-4 border-l-2 border-accent/50 bg-accent/[0.04] py-1 pl-4 italic text-content-muted;
   }
   .prose-peace code:not(pre code) {
-    @apply rounded bg-white/10 px-1.5 py-0.5 font-mono text-[0.86em] text-accent-light;
+    @apply rounded bg-field px-1.5 py-0.5 font-mono text-[0.86em] text-accent-dark dark:text-accent-light;
   }
   .prose-peace pre {
-    @apply my-4 overflow-x-auto rounded-xl border border-white/10 bg-[#0e0913] p-4 font-mono text-[13px] leading-6;
+    @apply my-4 overflow-x-auto rounded-xl border border-line bg-surface-sunken p-4 font-mono text-[13px] leading-6;
   }
   .prose-peace table {
     @apply my-4 w-full border-collapse text-sm;
   }
   .prose-peace th {
-    @apply border-b border-white/10 px-3 py-2 text-left text-white;
+    @apply border-b border-line px-3 py-2 text-left text-content-strong;
   }
   .prose-peace td {
-    @apply border-b border-white/5 px-3 py-2;
+    @apply border-b border-line-subtle px-3 py-2;
   }
   .prose-peace hr {
-    @apply my-6 border-white/10;
+    @apply my-6 border-line;
   }
 }
 
@@ -179,6 +293,160 @@
 
   .safe-bottom {
     padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /*
+   * Legacy mapper: existing screens paint with white-alpha overlays. In dark
+   * mode these are identical to before; in light mode they become dark-alpha,
+   * so already-built pages inherit light mode without touching every file.
+   */
+  [data-theme='light'] .bg-white\/\[0\.01\],
+  [data-theme='light'] .bg-white\/\[0\.02\] {
+    background-color: rgb(20 16 30 / 0.02);
+  }
+  [data-theme='light'] .bg-white\/\[0\.025\],
+  [data-theme='light'] .bg-white\/\[0\.03\] {
+    background-color: rgb(20 16 30 / 0.03);
+  }
+  [data-theme='light'] .bg-white\/\[0\.035\],
+  [data-theme='light'] .bg-white\/\[0\.04\] {
+    background-color: rgb(20 16 30 / 0.04);
+  }
+  [data-theme='light'] .bg-white\/5,
+  [data-theme='light'] .bg-white\/\[0\.05\],
+  [data-theme='light'] .bg-white\/\[0\.06\] {
+    background-color: rgb(20 16 30 / 0.055);
+  }
+  [data-theme='light'] .bg-white\/10,
+  [data-theme='light'] .bg-white\/\[0\.08\] {
+    background-color: rgb(20 16 30 / 0.085);
+  }
+  [data-theme='light'] .bg-white\/\[0\.1\] {
+    background-color: rgb(20 16 30 / 0.1);
+  }
+  [data-theme='light'] .bg-white\/20 {
+    background-color: rgb(20 16 30 / 0.16);
+  }
+  [data-theme='light'] .hover\:bg-white\/5:hover,
+  [data-theme='light'] .hover\:bg-white\/\[0\.03\]:hover,
+  [data-theme='light'] .hover\:bg-white\/\[0\.04\]:hover,
+  [data-theme='light'] .hover\:bg-white\/\[0\.05\]:hover,
+  [data-theme='light'] .hover\:bg-white\/\[0\.06\]:hover,
+  [data-theme='light'] .hover\:bg-white\/\[0\.07\]:hover {
+    background-color: rgb(20 16 30 / 0.06);
+  }
+  [data-theme='light'] .hover\:bg-white\/10:hover {
+    background-color: rgb(20 16 30 / 0.1);
+  }
+  [data-theme='light'] .hover\:bg-white\/20:hover {
+    background-color: rgb(20 16 30 / 0.16);
+  }
+
+  /* Borders: only the alpha-based lines flip; `border-white` (solid) is intentional. */
+  [data-theme='light'] .border-white\/5,
+  [data-theme='light'] .border-white\/\[0\.04\],
+  [data-theme='light'] .border-white\/\[0\.05\],
+  [data-theme='light'] .border-white\/\[0\.06\],
+  [data-theme='light'] .border-white\/\[0\.07\],
+  [data-theme='light'] .border-white\/\[0\.08\] {
+    border-color: rgb(20 16 30 / 0.07);
+  }
+  [data-theme='light'] .border-white\/10,
+  [data-theme='light'] .border-white\/15 {
+    border-color: rgb(20 16 30 / 0.11);
+  }
+  [data-theme='light'] .border-white\/20,
+  [data-theme='light'] .border-white\/25 {
+    border-color: rgb(20 16 30 / 0.18);
+  }
+  [data-theme='light'] .hover\:border-white\/20:hover,
+  [data-theme='light'] .hover\:border-white\/25:hover {
+    border-color: rgb(20 16 30 / 0.2);
+  }
+  [data-theme='light'] .divide-white\/5 > :not([hidden]) ~ :not([hidden]) {
+    border-color: rgb(20 16 30 / 0.07);
+  }
+  [data-theme='light'] .divide-white\/10 > :not([hidden]) ~ :not([hidden]) {
+    border-color: rgb(20 16 30 / 0.11);
+  }
+
+  /* Text: invert the neutral slate ramp and pure white. */
+  [data-theme='light'] .text-white {
+    color: rgb(20 16 30);
+  }
+  [data-theme='light'] .hover\:text-white:hover {
+    color: rgb(10 7 16);
+  }
+  [data-theme='light'] .text-slate-100,
+  [data-theme='light'] .text-slate-200 {
+    color: rgb(42 36 58);
+  }
+  [data-theme='light'] .text-slate-300 {
+    color: rgb(71 63 92);
+  }
+  [data-theme='light'] .text-slate-400 {
+    color: rgb(96 87 119);
+  }
+  [data-theme='light'] .text-slate-500 {
+    color: rgb(118 108 142);
+  }
+  [data-theme='light'] .text-slate-600 {
+    color: rgb(138 128 161);
+  }
+  [data-theme='light'] .placeholder\:text-slate-500::placeholder {
+    color: rgb(138 128 161);
+  }
+
+  /* Dark ink surfaces become elevated white surfaces. */
+  [data-theme='light'] .bg-ink-950 {
+    background-color: rgb(247 246 250);
+  }
+  [data-theme='light'] .bg-ink-900 {
+    background-color: #fff;
+  }
+  [data-theme='light'] .bg-ink-850,
+  [data-theme='light'] .bg-ink-800 {
+    background-color: rgb(240 238 245);
+  }
+
+  /* Coral on white needs more weight for legible contrast. */
+  [data-theme='light'] .text-accent {
+    color: #c2541f;
+  }
+  [data-theme='light'] .text-accent-light {
+    color: #a8420f;
+  }
+  [data-theme='light'] .text-iris-light {
+    color: #6d4de0;
+  }
+
+  /* Status tones */
+  [data-theme='light'] .text-amber-100,
+  [data-theme='light'] .text-amber-200 {
+    color: #854d0e;
+  }
+  [data-theme='light'] .text-amber-200\/80,
+  [data-theme='light'] .text-amber-200\/70 {
+    color: rgb(133 77 14 / 0.85);
+  }
+  [data-theme='light'] .text-amber-300 {
+    color: #a16207;
+  }
+  [data-theme='light'] .text-rose-100\/70,
+  [data-theme='light'] .text-rose-200 {
+    color: #9f1239;
+  }
+  [data-theme='light'] .text-rose-300 {
+    color: #be123c;
+  }
+  [data-theme='light'] .text-rose-400 {
+    color: #e11d48;
+  }
+  [data-theme='light'] .text-violet-300 {
+    color: #6d28d9;
+  }
+  [data-theme='light'] .text-sky-300 {
+    color: #0369a1;
   }
 }
 
@@ -235,6 +503,55 @@
   color: #66bb6a;
 }
 
+[data-theme='light'] .hljs {
+  color: #24292f;
+}
+[data-theme='light'] .hljs-comment,
+[data-theme='light'] .hljs-quote {
+  color: #6e7781;
+}
+[data-theme='light'] .hljs-keyword,
+[data-theme='light'] .hljs-selector-tag,
+[data-theme='light'] .hljs-literal {
+  color: #7c3aed;
+}
+[data-theme='light'] .hljs-string,
+[data-theme='light'] .hljs-doctag {
+  color: #0f766e;
+}
+[data-theme='light'] .hljs-number,
+[data-theme='light'] .hljs-symbol,
+[data-theme='light'] .hljs-bullet {
+  color: #c2410c;
+}
+[data-theme='light'] .hljs-title,
+[data-theme='light'] .hljs-section,
+[data-theme='light'] .hljs-function .hljs-title {
+  color: #1d4ed8;
+}
+[data-theme='light'] .hljs-attr,
+[data-theme='light'] .hljs-attribute,
+[data-theme='light'] .hljs-variable {
+  color: #a16207;
+}
+[data-theme='light'] .hljs-built_in,
+[data-theme='light'] .hljs-type {
+  color: #0e7490;
+}
+[data-theme='light'] .hljs-tag,
+[data-theme='light'] .hljs-name {
+  color: #1d4ed8;
+}
+[data-theme='light'] .hljs-meta {
+  color: #57606a;
+}
+[data-theme='light'] .hljs-deletion {
+  color: #b91c1c;
+}
+[data-theme='light'] .hljs-addition {
+  color: #15803d;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -244,4 +561,39 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/*
+ * Theme ordering safety net.
+ *
+ * `data-theme` on <html> holds the user's preference (light | dark | system).
+ * Tailwind emits each `dark:` utility in two blocks: `[data-theme='dark'] …`
+ * and `@media (prefers-color-scheme: dark) { [data-theme='system'] … }`.
+ * When the OS is dark, the media block can land after our `[data-theme='light']`
+ * overrides in the utilities layer and outrank them. These rules live after
+ * `@tailwind utilities`, so they win by source order without `!important`.
+ *
+ * Exceptions that are intentionally NOT reset here: accents that should stay
+ * dark on a light surface (primary buttons, coral badges).
+ */
+[data-theme='light'] .bg-surface-elevated {
+  background-color: rgb(var(--surface-elevated) / 0.85);
+}
+[data-theme='light'] .text-accent {
+  color: #c2541f;
+}
+[data-theme='light'] .text-amber-300 {
+  color: #a16207;
+}
+[data-theme='light'] .text-rose-300 {
+  color: #be123c;
+}
+[data-theme='light'] .text-violet-300 {
+  color: #6d28d9;
+}
+[data-theme='light'] .text-iris-light {
+  color: #6d4de0;
+}
+[data-theme='light'] .text-sky-300 {
+  color: #0369a1;
 }

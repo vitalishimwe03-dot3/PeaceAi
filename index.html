@@ -3,7 +3,31 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#050b17" />
+    <meta name="theme-color" content="#0e0913" />
+    <script>
+      // Apply the saved theme before first paint to avoid a flash of the wrong mode.
+      ;(function () {
+        try {
+          var stored = localStorage.getItem('peaceai:theme')
+          var pref = stored === 'light' || stored === 'dark' || stored === 'system' ? stored : 'system'
+          var resolved =
+            pref === 'system'
+              ? window.matchMedia('(prefers-color-scheme: dark)').matches
+                ? 'dark'
+                : 'light'
+              : pref
+          var root = document.documentElement
+          root.dataset.theme = pref
+          root.dataset.resolvedTheme = resolved
+          root.style.removeProperty('color-scheme')
+          var meta = document.querySelector('meta[name="theme-color"]')
+          if (meta) meta.content = resolved === 'dark' ? '#0e0913' : '#f7f6fa'
+        } catch (error) {
+          document.documentElement.dataset.theme = 'dark'
+          document.documentElement.dataset.resolvedTheme = 'dark'
+        }
+      })()
+    </script>
     <meta
       name="description"
       content="PeaceAI brings secure AI conversations, application development, cybersecurity services, cloud storage, and collaboration into one platform."
@@ -15,6 +39,8 @@
     />
     <meta property="og:type" content="website" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/logo.svg" />
+    <meta property="og:image" content="/logo.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link

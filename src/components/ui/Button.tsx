@@ -8,11 +8,11 @@ type Size = 'sm' | 'md' | 'lg' | 'icon'
 const variants: Record<Variant, string> = {
   primary:
     'bg-accent text-ink-950 shadow-[0_10px_32px_-12px_rgba(255,138,76,.7)] hover:bg-accent-light active:bg-accent-dark disabled:bg-accent/40',
-  secondary: 'bg-white text-ink-950 hover:bg-slate-200 disabled:bg-white/50',
-  outline: 'border border-white/15 bg-white/[0.03] text-white hover:border-white/25 hover:bg-white/[0.07]',
-  ghost: 'text-slate-300 hover:bg-white/[0.06] hover:text-white',
+  secondary: 'bg-content-strong text-surface-page hover:bg-content-strong/90 disabled:opacity-50',
+  outline: 'border border-line-strong bg-field text-content-strong hover:border-line-strong hover:bg-field-hover',
+  ghost: 'text-content-muted hover:bg-field-hover hover:text-content-strong',
   danger: 'bg-rose-500/90 text-white hover:bg-rose-500',
-  soft: 'bg-accent/10 text-accent hover:bg-accent/15',
+  soft: 'bg-accent/10 text-accent-dark hover:bg-accent/15 dark:text-accent',
 }
 
 const sizes: Record<Size, string> = {

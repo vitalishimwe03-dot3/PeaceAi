@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PeaceAI — Logo concepts</title>
+    <style>
+      :root {
+        --ink-950: #0e0913;
+        --ink-900: #151020;
+        --ink-850: #1b1429;
+        --ink-800: #241a35;
+        --accent: #ff8a4c;
+        --iris: #a78bfa;
+        --text: #f8f5ff;
+        --muted: #9a8fb5;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        padding: 56px 32px 96px;
+        font-family: Inter, "Segoe UI", system-ui, sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(900px 500px at 12% -8%, rgba(255, 138, 76, 0.13), transparent 60%),
+          radial-gradient(900px 560px at 88% 4%, rgba(167, 139, 250, 0.14), transparent 60%),
+          var(--ink-950);
+      }
+      header { max-width: 1180px; margin: 0 auto 48px; }
+      h1 {
+        font-family: "Space Grotesk", Inter, sans-serif;
+        font-size: 1.5rem; font-weight: 700; margin: 0 0 8px; letter-spacing: -0.02em;
+      }
+      header p { margin: 0; color: var(--muted); font-size: 0.9rem; max-width: 62ch; line-height: 1.6; }
+      .grid {
+        max-width: 1180px; margin: 0 auto;
+        display: grid; gap: 28px;
+        grid-template-columns: repeat(auto-fit, minmax(430px, 1fr));
+      }
+      .card {
+        background: linear-gradient(180deg, rgba(36, 26, 53, 0.72), rgba(21, 16, 32, 0.72));
+        border: 1px solid rgba(167, 139, 250, 0.16);
+        border-radius: 20px;
+        padding: 28px;
+        box-shadow: 0 30px 70px -40px rgba(0, 0, 0, 0.9);
+      }
+      .card h2 {
+        font-family: "Space Grotesk", Inter, sans-serif;
+        font-size: 0.78rem; font-weight: 600; margin: 0 0 6px;
+        letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted);
+      }
+      .card .note { margin: 0 0 22px; color: #7d7296; font-size: 0.78rem; line-height: 1.55; }
+      .stage {
+        display: flex; align-items: center; justify-content: center;
+        min-height: 150px; padding: 22px;
+        background: var(--ink-950);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 14px;
+      }
+      .stage.light { background: #f4f2f8; }
+      .row {
+        display: flex; align-items: flex-end; gap: 26px;
+        margin-top: 20px; padding: 18px 22px;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 14px;
+      }
+      .row .item { text-align: center; }
+      .row .item span {
+        display: block; margin-top: 8px;
+        font-size: 0.62rem; letter-spacing: 0.1em; color: #7d7296; text-transform: uppercase;
+      }
+      .lockup { width: 300px; height: auto; }
+      .mark-96 { width: 96px; height: 96px; }
+      .mark-64 { width: 64px; height: 64px; }
+      .mark-40 { width: 40px; height: 40px; }
+      .mark-28 { width: 28px; height: 28px; }
+      .mark-20 { width: 20px; height: 20px; }
+      .swatches { display: flex; gap: 10px; margin-top: 22px; flex-wrap: wrap; }
+      .swatch { display: flex; align-items: center; gap: 8px; font-size: 0.68rem; color: var(--muted); }
+      .chip { width: 22px; height: 22px; border-radius: 7px; border: 1px solid rgba(255, 255, 255, 0.12); }
+      .light-hint { margin: 12px 0 0; font-size: 0.7rem; color: #7d7296; }
+      a { color: var(--iris); }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>PeaceAI — logo concepts</h1>
+      <p>
+        Same brand palette as the app (ink + coral <code>#ff8a4c</code> + iris <code>#a78bfa</code>),
+        reworked into a calmer, higher-end mark. Pick one and I'll wire it into the app, favicon, and share image.
+      </p>
+    </header>
+
+    <div class="grid">
+      <section class="card">
+        <h2>Concept A — Shield &amp; Orbit</h2>
+        <p class="note">
+          Interlocking shield strokes read as security and trust; the orbit ring and core read as knowledge
+          and AI. Calm, premium, and distinct from the current sun-burst mark.
+        </p>
+        <div class="stage">
+          <img src="/logo-v2.svg" alt="PeaceAI concept A full lockup" class="lockup" />
+        </div>
+        <div class="row">
+          <div class="item"><img src="/logo-v2-mark.svg" alt="" class="mark-64" /><span>64</span></div>
+          <div class="item"><img src="/logo-v2-mark.svg" alt="" class="mark-40" /><span>40</span></div>
+          <div class="item"><img src="/logo-v2-mark.svg" alt="" class="mark-28" /><span>28</span></div>
+          <div class="item"><img src="/logo-v2-mark.svg" alt="" class="mark-20" /><span>20</span></div>
+        </div>
+        <div class="swatches">
+          <div class="swatch"><i class="chip" style="background:#ff8a4c"></i>coral</div>
+          <div class="swatch"><i class="chip" style="background:#ffb07d"></i>coral light</div>
+          <div class="swatch"><i class="chip" style="background:#a78bfa"></i>iris</div>
+          <div class="swatch"><i class="chip" style="background:#0e0913"></i>ink 950</div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Current logo (for comparison)</h2>
+        <p class="note">The existing mark: a sun-burst ring with a "P" monogram on a cool mint/blue gradient.</p>
+        <div class="stage">
+          <img src="/logo.svg" alt="Current PeaceAI logo" class="lockup" />
+        </div>
+        <div class="stage" style="margin-top:20px;">
+          <img src="/favicon.svg" alt="Current favicon" class="mark-64" />
+          <img src="/favicon.svg" alt="" class="mark-28" style="margin-left:18px;" />
+          <img src="/favicon.svg" alt="" class="mark-20" style="margin-left:18px;" />
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Concept A on light backgrounds</h2>
+        <p class="note">
+          The tile is dark-on-light safe, so it works on light UIs, invoices, and print without a second variant.
+        </p>
+        <div class="stage light">
+          <img src="/logo-v2.svg" alt="PeaceAI concept A on light background" class="lockup" />
+        </div>
+        <div class="row">
+          <div class="item"><img src="/logo-v2-mark.svg" alt="" class="mark-28" /><span>28</span></div>
+          <div class="item"><img src="/logo-v2-mark.svg" alt="" class="mark-20" /><span>20</span></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Files</h2>
+        <p class="note">
+          Drafts live in <code>public/</code> and are not referenced by the app yet, so the current branding is untouched.
+        </p>
+        <ul style="margin:0; padding-left:18px; color:#9a8fb5; font-size:.8rem; line-height:2;">
+          <li><code>public/logo-v2.svg</code> — full horizontal lockup</li>
+          <li><code>public/logo-v2-mark.svg</code> — square mark, for favicon and avatars</li>
+          <li><a href="/logo-v2.svg">open full lockup</a> · <a href="/logo-v2-mark.svg">open mark</a></li>
+        </ul>
+      </section>
+    </div>
+  </body>
+</html>

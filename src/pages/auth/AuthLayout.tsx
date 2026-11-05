@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { Link, Outlet } from 'react-router-dom'
 import { Lock, ShieldCheck, Sparkles } from 'lucide-react'
 import { Logo } from '@/components/ui/Logo'
+import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { useAuth } from '@/contexts/AuthContext'
 
 export function AuthLayout({ children }: { children?: ReactNode }) {
@@ -11,9 +12,12 @@ export function AuthLayout({ children }: { children?: ReactNode }) {
       <div className="flex flex-col px-5 py-6 sm:px-10 lg:px-16">
         <div className="flex items-center justify-between">
           <Logo />
-          <Link to="/" className="text-xs text-slate-400 transition-colors hover:text-white">
-            Back to website
-          </Link>
+          <div className="flex items-center gap-2">
+            <ThemeToggle showSystem />
+            <Link to="/" className="text-xs text-slate-400 transition-colors hover:text-white">
+              Back to website
+            </Link>
+          </div>
         </div>
         <main id="main-content" className="flex flex-1 items-center justify-center py-10">
           <div className="w-full max-w-md">

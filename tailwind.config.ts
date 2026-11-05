@@ -1,11 +1,57 @@
+import plugin from 'tailwindcss/plugin'
 import type { Config } from 'tailwindcss'
+import type { PluginAPI } from 'tailwindcss/types/config'
+
+/**
+ * The app historically used `dark:` for OS preference while being dark-only.
+ * We drive theming from `data-theme` on `<html>`, so `dark:` must follow that
+ * attribute instead of `.dark` or the raw media query.
+ */
+const themeVariant = plugin(({ addVariant }: PluginAPI) => {
+  addVariant('dark', [
+    '[data-theme="dark"] &',
+    ':where([data-theme="dark"]) &',
+    '@media (prefers-color-scheme: dark) { :where([data-theme="system"]) & }',
+  ])
+})
 
 export default {
-  darkMode: ['class'],
+  // Theme is driven by the `themeVariant` plugin below (data-theme on <html>),
+  // so Tailwind's built-in `darkMode` strategy is intentionally not set.
   content: ['./index.html', './src/**/*.{ts,tsx}'],
   theme: {
     extend: {
       colors: {
+        /*
+         * Semantic tokens backed by CSS variables (see src/index.css). Every
+         * `*-surface|content|field|line|tint` utility follows the active theme,
+         * so components stay theme-agnostic. Raw palettes (ink, accent, iris,
+         * slate, …) are reserved for accents that must not invert.
+         */
+        surface: {
+          page: 'rgb(var(--surface-page) / <alpha-value>)',
+          elevated: 'rgb(var(--surface-elevated) / <alpha-value>)',
+          sunken: 'rgb(var(--surface-sunken) / <alpha-value>)',
+          floating: 'rgb(var(--surface-floating) / <alpha-value>)',
+        },
+        content: {
+          DEFAULT: 'rgb(var(--content) / <alpha-value>)',
+          muted: 'rgb(var(--content-muted) / <alpha-value>)',
+          subtle: 'rgb(var(--content-subtle) / <alpha-value>)',
+          faint: 'rgb(var(--content-faint) / <alpha-value>)',
+          strong: 'rgb(var(--content-strong) / <alpha-value>)',
+        },
+        field: {
+          DEFAULT: 'rgb(var(--field) / <alpha-value>)',
+          hover: 'rgb(var(--field-hover) / <alpha-value>)',
+          active: 'rgb(var(--field-active) / <alpha-value>)',
+        },
+        line: {
+          DEFAULT: 'rgb(var(--line) / <alpha-value>)',
+          strong: 'rgb(var(--line-strong) / <alpha-value>)',
+          subtle: 'rgb(var(--line-subtle) / <alpha-value>)',
+        },
+        tint: 'rgb(var(--tint) / <alpha-value>)',
         ink: {
           950: '#0e0913',
           900: '#151020',
@@ -58,5 +104,5 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [themeVariant],
 } satisfies Config

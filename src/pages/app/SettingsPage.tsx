@@ -8,6 +8,7 @@ import {
   Mail,
   Shield,
   ShieldOff,
+  SunMedium,
   Trash2,
   UserRound,
 } from 'lucide-react'
@@ -20,6 +21,7 @@ import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Field'
 import { Modal } from '@/components/ui/Modal'
+import { ThemePicker } from '@/components/ui/ThemeToggle'
 import { listBlockedProfiles, unblockUser, exportAccountData } from '@/lib/repository'
 import { downloadTextFile, formatDate, getErrorMessage } from '@/lib/utils'
 import type { Profile } from '@/types/domain'
@@ -178,6 +180,17 @@ export function SettingsPage() {
       <PageHeader title="Settings" description="Manage your account, security, privacy, and personal data." />
 
       <div className="mx-auto max-w-3xl space-y-5">
+        <section className="card-surface p-5">
+          <div className="mb-4 flex items-center gap-2">
+            <SunMedium className="h-4 w-4 text-accent" />
+            <h2 className="text-sm font-medium text-white">Appearance</h2>
+          </div>
+          <p className="mb-4 text-[11px] leading-5 text-slate-500">
+            Choose how PeaceAI looks on this device. System follows your operating system setting.
+          </p>
+          <ThemePicker />
+        </section>
+
         <section className="card-surface p-5">
           <div className="mb-5 flex items-center gap-2">
             <UserRound className="h-4 w-4 text-accent" />

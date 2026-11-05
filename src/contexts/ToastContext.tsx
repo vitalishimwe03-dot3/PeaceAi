@@ -32,9 +32,9 @@ const icons = {
 }
 
 const tones = {
-  success: 'border-accent/25 text-accent',
-  error: 'border-rose-400/25 text-rose-300',
-  info: 'border-sky-400/25 text-sky-300',
+  success: 'border-accent/25 text-accent-dark dark:text-accent',
+  error: 'border-rose-400/25 text-rose-600 dark:text-rose-300',
+  info: 'border-sky-400/25 text-sky-700 dark:text-sky-300',
 }
 
 export function ToastProvider({ children }: { children: ReactNode }) {
@@ -80,7 +80,7 @@ function ToastItem({ toast, onDismiss }: { toast: Toast; onDismiss: () => void }
   return (
     <div
       className={cn(
-        'pointer-events-auto flex items-start gap-3 rounded-xl border bg-ink-900/95 p-4 shadow-2xl backdrop-blur transition-all duration-300',
+        'pointer-events-auto flex items-start gap-3 rounded-xl border bg-surface-floating/95 p-4 shadow-2xl backdrop-blur transition-all duration-300',
         tones[toast.tone],
         visible ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0',
       )}
@@ -88,13 +88,13 @@ function ToastItem({ toast, onDismiss }: { toast: Toast; onDismiss: () => void }
     >
       <Icon className="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true" />
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-semibold text-white">{toast.title}</p>
-        {toast.description ? <p className="mt-0.5 text-xs text-slate-400">{toast.description}</p> : null}
+        <p className="text-sm font-semibold text-content-strong">{toast.title}</p>
+        {toast.description ? <p className="mt-0.5 text-xs text-content-muted">{toast.description}</p> : null}
       </div>
       <button
         type="button"
         onClick={onDismiss}
-        className="rounded p-0.5 text-slate-500 hover:text-white focus-ring"
+        className="rounded p-0.5 text-content-subtle hover:text-content-strong focus-ring"
         aria-label="Dismiss notification"
       >
         <X className="h-3.5 w-3.5" />

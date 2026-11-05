@@ -40,6 +40,7 @@ import {
   createConversation,
   deleteConversation,
   getUsageSummary,
+  ingestKnowledge,
   listAiModels,
   listConversations,
   listMessages,
@@ -218,6 +219,34 @@ export function AssistantPage() {
     event?.preventDefault()
     const content = (override ?? prompt).trim()
     if (!content || sending) return
+
+    // Self-serve knowledge ingestion: "/learn <title>: <text>" (or "/dataset ...")
+    if (/^\/(learn|dataset|knowledge)\b/i.test(content)) {
+      setSending(true)
+      setError('')
+      setLimit(null)
+      try {
+        const raw = content.replace(/^\/(learn|dataset|knowledge)\b/i, '').trim()
+        const split = raw.indexOf(':')
+        const name = (split > 0 ? raw.slice(0, split) : raw.slice(0, 60) || 'AI knowledge').trim()
+        const body = (split > 0 ? raw.slice(split + 1) : raw).trim()
+        if (body.length < 20) throw new Error('Provide at least 20 characters after the command, e.g. `/learn Product FAQ: ...`')
+        const result = await ingestKnowledge({ name, content: body, description: 'Added by AI assistant (self-ingest).' })
+        setPrompt('')
+        toast({
+          title: 'Knowledge saved',
+          description: result.message || `Saved${result.chunkCount ? ` (${result.chunkCount} chunks)` : ''}. It can be retrieved in future answers when configured.`,
+          tone: 'success',
+        })
+      } catch (err) {
+        setError(getErrorMessage(err, 'Could not save knowledge.'))
+        toast({ title: 'Knowledge save failed', description: getErrorMessage(err), tone: 'error' })
+      } finally {
+        setSending(false)
+      }
+      return
+    }
+
     setSending(true)
     setError('')
     setLimit(null)
@@ -713,7 +742,7 @@ export function AssistantPage() {
                   }
                 }}
                 rows={2}
-                placeholder="Message PeaceAI... (Shift+Enter for new line)"
+                placeholder="Message PeaceAI... Use /learn Title: text to save approved knowledge. (Shift+Enter for new line)"
                 className="max-h-40 min-h-[3rem] w-full resize-none bg-transparent px-2.5 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none"
               />
               <div className="flex items-center justify-between gap-2 px-1">

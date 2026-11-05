@@ -9,7 +9,7 @@ import {
 import { cn } from '@/lib/utils'
 
 const fieldBase =
-  'w-full rounded-xl border border-white/10 bg-ink-950/70 px-3.5 py-2.5 text-sm text-white placeholder:text-slate-500 transition-colors hover:border-white/20 focus:border-accent/60 focus:outline-none focus:ring-2 focus:ring-accent/20 disabled:cursor-not-allowed disabled:opacity-50'
+  'w-full rounded-xl border border-line bg-surface-sunken px-3.5 py-2.5 text-sm text-content-strong placeholder:text-content-faint transition-colors hover:border-line-strong focus:border-accent/60 focus:outline-none focus:ring-2 focus:ring-accent/20 disabled:cursor-not-allowed disabled:opacity-50'
 
 export function Label({
   htmlFor,
@@ -178,7 +178,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
         >
           {options
             ? options.map((option) => (
-                <option key={option.value} value={option.value} disabled={option.disabled} className="bg-ink-900">
+                <option key={option.value} value={option.value} disabled={option.disabled} className="bg-surface-elevated text-content-strong">
                   {option.label}
                 </option>
               ))

@@ -1356,12 +1356,53 @@ export async function deleteKnowledgeDataset(dataset: KnowledgeDataset): Promise
     })
     return
   }
-  const { error: storageError } = await client()
-    .storage.from(KNOWLEDGE_BUCKET)
-    .remove([dataset.storage_path])
-  if (storageError) throw storageError
+  // Self-ingested text may not have a real storage object (storage_path under self/).
+  if (dataset.storage_path && !dataset.storage_path.startsWith('self/')) {
+    const { error: storageError } = await client()
+      .storage.from(KNOWLEDGE_BUCKET)
+      .remove([dataset.storage_path])
+    if (storageError) {
+      console.warn('Knowledge storage remove warning', storageError)
+    }
+  }
   const { error } = await client().from('knowledge_datasets').delete().eq('id', dataset.id)
   if (error) throw error
+}
+
+export async function ingestKnowledge(input: {
+  name: string
+  description?: string | null
+  content: string
+}): Promise<{ ok: boolean; datasetId?: string; chunkCount?: number; message?: string }> {
+  if (!isSupabaseConfigured) {
+    return mutateState((state) => {
+      const idVal = id('dataset')
+      state.datasets.unshift({
+        id: idVal,
+        name: input.name.trim() || 'AI knowledge',
+        description: input.description?.trim() || 'Added locally (preview).',
+        storage_path: `self/preview/${idVal}.txt`,
+        mime_type: 'text/plain',
+        size_bytes: input.content.length,
+        status: 'ready',
+        chunk_count: Math.max(1, Math.ceil(input.content.length / 12000)),
+        error_message: null,
+        uploaded_by: getPreviewSession()?.userId ?? 'preview-user',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      } as KnowledgeDataset)
+      return { ok: true, datasetId: idVal, chunkCount: Math.max(1, Math.ceil(input.content.length / 12000)), message: 'Saved locally in preview mode.' }
+    })
+  }
+  const { data, error } = await client().functions.invoke('ingest-knowledge', {
+    body: {
+      name: input.name,
+      description: input.description ?? undefined,
+      content: input.content,
+    },
+  })
+  if (error) throw error
+  return (data ?? { ok: true }) as { ok: boolean; datasetId?: string; chunkCount?: number; message?: string }
 }
 
 export async function listAiModels(): Promise<AiModel[]> {

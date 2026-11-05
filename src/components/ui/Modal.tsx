@@ -52,7 +52,7 @@ export function Modal({ open, onClose, title, description, children, footer, cla
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <button
         type="button"
-        className="absolute inset-0 cursor-default bg-ink-950/80 backdrop-blur-sm"
+        className="absolute inset-0 cursor-default bg-surface-sunken/80 backdrop-blur-sm"
         onClick={onClose}
         aria-label="Close dialog"
         tabIndex={-1}
@@ -64,17 +64,17 @@ export function Modal({ open, onClose, title, description, children, footer, cla
         aria-labelledby="modal-title"
         aria-describedby={description ? 'modal-description' : undefined}
         className={cn(
-          'relative z-10 max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-white/10 bg-ink-900 p-6 shadow-2xl animate-fade-up',
+          'relative z-10 max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-line bg-surface-elevated p-6 shadow-2xl animate-fade-up',
           className,
         )}
       >
         <div className="mb-5 flex items-start justify-between gap-4">
           <div>
-            <h2 id="modal-title" className="text-lg font-semibold text-white">
+            <h2 id="modal-title" className="text-lg font-semibold text-content-strong">
               {title}
             </h2>
             {description ? (
-              <p id="modal-description" className="mt-1 text-sm text-slate-400">
+              <p id="modal-description" className="mt-1 text-sm text-content-muted">
                 {description}
               </p>
             ) : null}
@@ -82,7 +82,7 @@ export function Modal({ open, onClose, title, description, children, footer, cla
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-white/10 hover:text-white focus-ring"
+            className="rounded-lg p-1.5 text-content-muted transition-colors hover:bg-field-hover hover:text-content-strong focus-ring"
             aria-label="Close"
           >
             <X className="h-4 w-4" />
@@ -126,7 +126,7 @@ export function ConfirmDialog({
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex h-10 items-center rounded-full px-4 text-sm font-semibold text-slate-300 hover:bg-white/5"
+            className="inline-flex h-10 items-center rounded-full px-4 text-sm font-semibold text-content-muted hover:bg-field-hover"
           >
             Cancel
           </button>
