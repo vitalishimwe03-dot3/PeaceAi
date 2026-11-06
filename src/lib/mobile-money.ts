@@ -8,6 +8,8 @@ export function normalizeRwandanPhone(value: string): string | null {
   let national = ''
   if (digits.startsWith('250') && digits.length === 12) {
     national = digits.slice(3)
+  } else if (digits.startsWith('250') && digits.length === 13 && digits[3] === '0') {
+    national = digits.slice(4)
   } else if (digits.startsWith('0') && digits.length === 10) {
     national = digits.slice(1)
   } else if (digits.length === 9 && digits.startsWith('7')) {

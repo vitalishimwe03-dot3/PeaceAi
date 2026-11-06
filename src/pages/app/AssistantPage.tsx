@@ -112,7 +112,7 @@ export function AssistantPage() {
         const enabled = modelRows.filter((model) => model.enabled)
         setModels(enabled)
         setSelectedModel(enabled[0]?.model_id ?? '')
-        setUsage(usageRow)
+        setUsage(user.isAnonymous ? { ...usageRow, messagesLimit: Math.min(usageRow.messagesLimit, 5) } : usageRow)
         const requested = params.get('conversation')
         const initialPrompt = sessionStorage.getItem('peaceai.initialPrompt')
         if (requested && conversationRows.some((row) => row.id === requested)) {
@@ -180,7 +180,8 @@ export function AssistantPage() {
 
   const refreshUsage = async () => {
     try {
-      setUsage(await getUsageSummary(user.id))
+      const nextUsage = await getUsageSummary(user.id)
+      setUsage(user.isAnonymous ? { ...nextUsage, messagesLimit: Math.min(nextUsage.messagesLimit, 5) } : nextUsage)
     } catch {
       // Usage refresh is best-effort.
     }

@@ -350,6 +350,12 @@ begin
     raise exception 'No plan is configured. Contact an administrator.' using errcode = 'P0002';
   end if;
 
+  if exists (select 1 from auth.users where id = p_user_id and coalesce(is_anonymous, false)) then
+    v_plan.ai_messages_per_day := least(v_plan.ai_messages_per_day, 5);
+    v_plan.ai_requests_per_minute := least(v_plan.ai_requests_per_minute, 2);
+    v_plan.premium_models := false;
+  end if;
+
   if p_model is not null and length(trim(p_model)) > 0 then
     select enabled, is_premium into v_model_enabled, v_premium
     from public.ai_models

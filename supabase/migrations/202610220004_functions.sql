@@ -203,6 +203,12 @@ begin
     raise exception 'No active plan is configured.';
   end if;
 
+  if exists (select 1 from auth.users where id = p_user_id and coalesce(is_anonymous, false)) then
+    v_plan.ai_messages_per_day := least(v_plan.ai_messages_per_day, 5);
+    v_plan.ai_requests_per_minute := least(v_plan.ai_requests_per_minute, 2);
+    v_plan.premium_models := false;
+  end if;
+
   select count(*) into v_messages_today
   from public.messages
   where user_id = p_user_id

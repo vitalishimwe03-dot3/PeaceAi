@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/Field'
 import { getErrorMessage } from '@/lib/utils'
 
 export function SignInPage() {
-  const { user, signIn, signInAnonymously, previewSignIn, isPreview, loading: authLoading, isAnonymous } = useAuth()
+  const { user, signIn, signInAnonymously, previewSignIn, isPreview, loading: authLoading } = useAuth()
   const { toast } = useToast()
   const navigate = useNavigate()
   const [params] = useSearchParams()
