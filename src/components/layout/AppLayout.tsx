@@ -3,6 +3,7 @@ import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-do
 import {
   AppWindow,
   Bell,
+  Brain,
   Bot,
   ChevronDown,
   Code2,
@@ -31,6 +32,7 @@ const userNav = [
   { label: 'AI Assistant', to: '/app/assistant', icon: Bot },
   { label: 'AI Development', to: '/app/development', icon: Code2 },
   { label: 'My Apps', to: '/app/apps', icon: AppWindow },
+  { label: 'AI Models', to: '/app/models', icon: Brain },
   { label: 'Cloud Storage', to: '/app/storage', icon: Files },
   { label: 'Collaboration', to: '/app/collaboration', icon: MessagesSquare },
   { label: 'Service Requests', to: '/app/services', icon: Wrench },

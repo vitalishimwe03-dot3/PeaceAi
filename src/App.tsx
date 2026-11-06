@@ -27,6 +27,7 @@ import { DashboardPage } from '@/pages/app/DashboardPage'
 import { AssistantPage } from '@/pages/app/AssistantPage'
 import { DevelopmentPage } from '@/pages/app/DevelopmentPage'
 import { AppAppsPage } from '@/pages/app/AppAppsPage'
+import { ModelsPage } from '@/pages/app/ModelsPage'
 import { StoragePage } from '@/pages/app/StoragePage'
 import { CollaborationPage } from '@/pages/app/CollaborationPage'
 import { AppServicesPage } from '@/pages/app/AppServicesPage'
@@ -103,6 +104,7 @@ export default function App() {
           <Route path="/app/assistant" element={<AssistantPage />} />
           <Route path="/app/development" element={<DevelopmentPage />} />
           <Route path="/app/apps" element={<AppAppsPage />} />
+          <Route path="/app/models" element={<ModelsPage />} />
           <Route path="/app/storage" element={<StoragePage />} />
           <Route path="/app/collaboration" element={<CollaborationPage />} />
           <Route path="/app/services" element={<AppServicesPage />} />

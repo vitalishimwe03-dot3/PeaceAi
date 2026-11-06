@@ -13,7 +13,7 @@ import {
   setPreviewSession,
   storePreviewBlob,
 } from './demo'
-import { fallbackPlans, fallbackServices } from './catalog'
+import { fallbackModels, fallbackPlans, fallbackServices } from './catalog'
 import { safeFileName } from './utils'
 import type {
   AdminUserRow,
@@ -29,6 +29,8 @@ import type {
   Folder,
   KnowledgeDataset,
   Message,
+  ModelListing,
+  ModelTrainingJob,
   Payment,
   Plan,
   Profile,
@@ -1437,8 +1439,8 @@ export async function ingestKnowledge(input: {
 
 export async function listAiModels(): Promise<AiModel[]> {
   if (!isSupabaseConfigured) {
-    const { fallbackModels } = await import('./catalog')
-    return fallbackModels
+    const state = loadState()
+    return state.aiModels ?? fallbackModels
   }
   const { data, error } = await client().from('ai_models').select('*').order('sort_order')
   if (error) throw error
@@ -1871,9 +1873,130 @@ export async function updateAdminPlan(planId: string, patch: Partial<Plan>): Pro
 }
 
 export async function updateAiModel(modelId: string, patch: Partial<AiModel>): Promise<void> {
-  if (!isSupabaseConfigured) return
+  if (!isSupabaseConfigured) {
+    mutateState((state) => {
+      const model = (state.aiModels ?? []).find((item) => item.id === modelId)
+      if (model) Object.assign(model, patch)
+    })
+    return
+  }
   const { error } = await client().from('ai_models').update(patch).eq('id', modelId)
   if (error) throw error
+}
+
+export async function listModelTrainingJobs(userId: string): Promise<ModelTrainingJob[]> {
+  if (!isSupabaseConfigured) {
+    return loadState().modelTrainingJobs.filter((job) => job.user_id === userId)
+  }
+  return []
+}
+
+export async function createModelTrainingJob(
+  userId: string,
+  input: { name: string; baseModelId: string; datasetId: string | null },
+): Promise<ModelTrainingJob> {
+  const now = new Date().toISOString()
+  const job: ModelTrainingJob = {
+    id: id('training-job'),
+    user_id: userId,
+    name: input.name.trim() || 'Custom model',
+    base_model_id: input.baseModelId,
+    dataset_id: input.datasetId,
+    status: 'queued',
+    progress: 0,
+    result_model_id: null,
+    created_at: now,
+    updated_at: now,
+  }
+  if (!isSupabaseConfigured) {
+    return mutateState((state) => {
+      state.modelTrainingJobs.unshift(job)
+      // Simulate a completed trained model for preview mode.
+      const trainedModel: AiModel = {
+        id: id('model'),
+        provider: 'peaceai',
+        model_id: `peaceai-custom-${job.id}`,
+        display_name: job.name,
+        description: `Custom model trained from ${input.datasetId ? 'a knowledge dataset' : 'base model'}.`,
+        enabled: true,
+        is_premium: true,
+        sort_order: 100,
+        source: 'peaceai',
+        trainable: true,
+        training_status: 'ready',
+        base_model_id: input.baseModelId,
+        owner_id: userId,
+        version: '1.0',
+        capabilities: ['chat', 'custom'],
+      }
+      state.aiModels = state.aiModels ?? []
+      state.aiModels.unshift(trainedModel)
+      const created = state.modelTrainingJobs.find((item) => item.id === job.id)
+      if (created) {
+        created.status = 'ready'
+        created.progress = 100
+        created.result_model_id = trainedModel.id
+        created.updated_at = new Date().toISOString()
+      }
+      return (state.modelTrainingJobs.find((item) => item.id === job.id) as ModelTrainingJob)
+    })
+  }
+  return job
+}
+
+export async function listUserModels(userId: string): Promise<AiModel[]> {
+  if (!isSupabaseConfigured) {
+    return (loadState().aiModels ?? []).filter((model) => model.owner_id === userId)
+  }
+  return []
+}
+
+export async function listModelListings(): Promise<ModelListing[]> {
+  if (!isSupabaseConfigured) return loadState().modelListings
+  return []
+}
+
+export async function publishModelListing(
+  userId: string,
+  modelId: string,
+  priceRwf: number,
+): Promise<ModelListing> {
+  const listing: ModelListing = {
+    id: id('listing'),
+    model_id: modelId,
+    seller_id: userId,
+    price_rwf: priceRwf,
+    currency: 'RWF',
+    status: 'published',
+    downloads: 0,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  }
+  if (!isSupabaseConfigured) {
+    return mutateState((state) => {
+      state.modelListings.unshift(listing)
+      const model = (state.aiModels ?? []).find((item) => item.id === modelId)
+      if (model) {
+        model.price_rwf = priceRwf
+        model.training_status = 'ready'
+      }
+      return listing
+    })
+  }
+  return listing
+}
+
+export async function buyModelListing(listingId: string): Promise<void> {
+  if (!isSupabaseConfigured) {
+    mutateState((state) => {
+      const listing = state.modelListings.find((item) => item.id === listingId)
+      if (listing) {
+        listing.downloads += 1
+        listing.updated_at = new Date().toISOString()
+      }
+    })
+    return
+  }
 }
 
 export async function getDashboardStats() {

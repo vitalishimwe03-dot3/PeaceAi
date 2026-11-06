@@ -39,6 +39,10 @@ export interface Plan {
   features: string[]
   active: boolean
   sort_order: number
+  max_trained_models?: number
+  can_train_models?: boolean
+  can_publish_models?: boolean
+  external_model_access?: boolean
 }
 
 export interface Subscription {
@@ -114,6 +118,41 @@ export interface AiModel {
   enabled: boolean
   is_premium: boolean
   sort_order: number
+  source?: 'peaceai' | 'external' | string
+  trainable?: boolean
+  training_status?: 'not_trained' | 'training' | 'ready' | null
+  base_model_id?: string | null
+  price_rwf?: number | null
+  owner_id?: string | null
+  version?: string | null
+  capabilities?: string[]
+}
+
+export type ModelTrainingStatus = 'queued' | 'training' | 'ready' | 'failed'
+
+export interface ModelTrainingJob {
+  id: string
+  user_id: string
+  name: string
+  base_model_id: string
+  dataset_id: string | null
+  status: ModelTrainingStatus
+  progress: number
+  result_model_id: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface ModelListing {
+  id: string
+  model_id: string
+  seller_id: string
+  price_rwf: number
+  currency: string
+  status: 'draft' | 'published' | 'sold' | 'archived'
+  downloads: number
+  created_at: string
+  updated_at: string
 }
 
 export interface Folder {

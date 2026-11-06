@@ -1,6 +1,7 @@
 import { DEFAULT_STORAGE_QUOTA_BYTES } from './env'
-import { fallbackPlans, fallbackServices, serviceCategories } from './catalog'
+import { fallbackModels, fallbackPlans, fallbackServices, serviceCategories } from './catalog'
 import type {
+  AiModel,
   AppDelivery,
   AuditLog,
   ChatThread,
@@ -12,6 +13,8 @@ import type {
   Folder,
   KnowledgeDataset,
   Message,
+  ModelListing,
+  ModelTrainingJob,
   Payment,
   Plan,
   Profile,
@@ -43,6 +46,9 @@ interface PreviewState {
   subscriptions: Subscription[]
   payments: Payment[]
   datasets: KnowledgeDataset[]
+  aiModels: AiModel[]
+  modelTrainingJobs: ModelTrainingJob[]
+  modelListings: ModelListing[]
   auditLogs: AuditLog[]
   connections: Connection[]
   threads: ChatThread[]
@@ -323,6 +329,9 @@ function seed(): PreviewState {
     subscriptions: [subscription],
     payments: [],
     datasets,
+    aiModels: fallbackModels,
+    modelTrainingJobs: [],
+    modelListings: [],
     auditLogs,
     connections: [],
     threads: [thread],
