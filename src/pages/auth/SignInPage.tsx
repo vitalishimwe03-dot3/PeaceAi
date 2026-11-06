@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/Field'
 import { getErrorMessage } from '@/lib/utils'
 
 export function SignInPage() {
-  const { user, signIn, previewSignIn, isPreview, loading: authLoading } = useAuth()
+  const { user, signIn, signInAnonymously, previewSignIn, isPreview, loading: authLoading, isAnonymous } = useAuth()
   const { toast } = useToast()
   const navigate = useNavigate()
   const [params] = useSearchParams()
@@ -31,6 +31,20 @@ export function SignInPage() {
       navigate(next, { replace: true })
     } catch (err) {
       setError(getErrorMessage(err, 'Sign-in failed. Check your email and password.'))
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const enterGuest = async () => {
+    setError('')
+    setLoading(true)
+    try {
+      await signInAnonymously()
+      toast({ title: 'Continuing as guest', description: 'AI messages are limited for guest sessions.', tone: 'info' })
+      navigate(next, { replace: true })
+    } catch (err) {
+      setError(getErrorMessage(err, 'Guest sign-in failed.'))
     } finally {
       setLoading(false)
     }
@@ -115,6 +129,22 @@ export function SignInPage() {
           </p>
         ) : null}
       </form>
+
+      {!isPreview ? (
+        <div className="mt-4">
+          <button
+            type="button"
+            onClick={() => void enterGuest()}
+            disabled={loading}
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2.5 text-sm text-slate-300 transition-colors hover:bg-white/[0.06] disabled:opacity-50"
+          >
+            Continue as guest
+          </button>
+          <p className="mt-2 text-center text-[11px] text-slate-500">
+            Guest sessions can use AI messages with a limited daily allowance.
+          </p>
+        </div>
+      ) : null}
 
       <p className="mt-6 text-center text-sm text-slate-400">
         New to PeaceAI?{' '}

@@ -38,6 +38,7 @@ jwt_expiry = 3600
 enable_refresh_token_rotation = true
 refresh_token_reuse_interval = 10
 enable_signup = true
+enable_anonymous_sign_ins = true
 minimum_password_length = 8
 
 [auth.email]

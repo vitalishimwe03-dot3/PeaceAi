@@ -19,6 +19,7 @@ export interface AppUser {
   profile: Profile
   isAdmin: boolean
   isPreview: boolean
+  isAnonymous: boolean
 }
 
 interface AuthContextValue {
@@ -27,6 +28,7 @@ interface AuthContextValue {
   loading: boolean
   configured: boolean
   isPreview: boolean
+  isAnonymous: boolean
   signIn: (email: string, password: string) => Promise<void>
   signUp: (email: string, password: string, fullName: string) => Promise<{ needsVerification: boolean }>
   signOut: () => Promise<void>
@@ -36,18 +38,20 @@ interface AuthContextValue {
   updateProfileDetails: (patch: Partial<Pick<Profile, 'full_name' | 'avatar_url'>>) => Promise<void>
   refresh: () => Promise<void>
   previewSignIn: (role: 'user' | 'admin') => Promise<void>
+  signInAnonymously: () => Promise<void>
   deleteAccount: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
 
-function toAppUser(profile: Profile, isPreview = false): AppUser {
+function toAppUser(profile: Profile, isPreview = false, isAnonymous = false): AppUser {
   return {
     id: profile.id,
     email: profile.email,
     profile,
     isAdmin: profile.role === 'admin',
     isPreview,
+    isAnonymous,
   }
 }
 
@@ -78,17 +82,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     try {
       const profile = await getProfile(nextSession.user.id)
-      setUser(toAppUser(profile ?? fallbackProfile(nextSession)))
+      setUser(toAppUser(profile ?? fallbackProfile(nextSession), false, Boolean(nextSession.user.is_anonymous)))
     } catch {
-      setUser(toAppUser(fallbackProfile(nextSession)))
+      setUser(toAppUser(fallbackProfile(nextSession), false, Boolean(nextSession.user.is_anonymous)))
     }
   }, [])
 
   useEffect(() => {
     if (!isSupabaseConfigured) {
-      const previewProfile = preview.profile()
-      setUser(previewProfile ? toAppUser(previewProfile, true) : null)
-      setLoading(false)
+  const previewProfile = preview.profile()
+  setUser(previewProfile ? toAppUser(previewProfile, true, false) : null)
+  setLoading(false)
       return
     }
     if (!supabase) {
@@ -174,13 +178,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const updateProfileDetails = useCallback(
     async (patch: Partial<Pick<Profile, 'full_name' | 'avatar_url'>>) => {
       if (!user) throw new Error('You must be signed in.')
-      if (user.isPreview) {
-        const updated = await updateProfile(user.id, patch)
-        setUser(toAppUser(updated, true))
-        return
-      }
-      const updated = await updateProfile(user.id, patch)
-      setUser(toAppUser(updated))
+       if (user.isPreview) {
+         const updated = await updateProfile(user.id, patch)
+         setUser(toAppUser(updated, true, user.isAnonymous))
+         return
+       }
+       const updated = await updateProfile(user.id, patch)
+       setUser(toAppUser(updated, false, user.isAnonymous))
     },
     [user],
   )
@@ -188,7 +192,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const refresh = useCallback(async () => {
     if (!isSupabaseConfigured) {
       const previewProfile = preview.profile()
-      setUser(previewProfile ? toAppUser(previewProfile, true) : null)
+      setUser(previewProfile ? toAppUser(previewProfile, true, false) : null)
       return
     }
     if (!supabase) return
@@ -199,9 +203,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const previewSignIn = useCallback(async (role: 'user' | 'admin') => {
     if (isSupabaseConfigured) throw new Error('Preview sign-in is disabled when Supabase is configured.')
     const profile = preview.signIn(role)
-    setUser(toAppUser(profile, true))
+    setUser(toAppUser(profile, true, false))
   }, [])
 
+  const signInAnonymously = useCallback(async () => {
+    if (!supabase) throw new Error('Supabase authentication is not configured.')
+    const { data, error } = await supabase.auth.signInAnonymously()
+    if (error) throw error
+    if (data.session) await hydrate(data.session)
+    else throw new Error('Anonymous sign-in did not return a session.')
+  }, [hydrate])
   const deleteAccount = useCallback(async () => {
     if (!user) throw new Error('You must be signed in.')
     if (user.isPreview) {
@@ -219,9 +230,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       session,
       loading,
       configured: isSupabaseConfigured,
-      isPreview: !isSupabaseConfigured,
-      signIn,
-      signUp,
+    isPreview: !isSupabaseConfigured,
+    isAnonymous: user?.isAnonymous ?? false,
+    signIn,
+    signInAnonymously,
+    signUp,
       signOut,
       resetPassword,
       updatePassword,
@@ -235,9 +248,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       session,
       loading,
-      signIn,
-      signUp,
-      signOut,
+       signIn,
+       signInAnonymously,
+       signUp,
+       signOut,
       resetPassword,
       updatePassword,
       updateEmail,
