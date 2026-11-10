@@ -35,7 +35,17 @@ Secure AI platform (React + Vite + TypeScript + Supabase) for AI chat, developme
    ```bash
    supabase db push
    ```
-3. Deploy Edge Functions:
+3. Create the owner admin account (run locally with server-only credentials):
+   ```bash
+   # PowerShell example; never commit these values
+   $env:SUPABASE_URL="https://<project-ref>.supabase.co"
+   $env:SUPABASE_SERVICE_ROLE_KEY="<service-role-key>"
+   $env:ADMIN_EMAIL="vitalishimwe@gmail.com"
+   $env:ADMIN_PASSWORD="<strong-password>"
+   npm run admin:create
+   ```
+   The script creates or updates the auth user, promotes its profile to `admin`, and keeps the support email in sync.
+4. Deploy Edge Functions:
    ```bash
    supabase functions deploy ai-chat
    supabase functions deploy process-dataset
@@ -45,11 +55,14 @@ Secure AI platform (React + Vite + TypeScript + Supabase) for AI chat, developme
    supabase functions deploy contact-message
    supabase functions deploy delete-account
    ```
-4. Set Edge Function secrets (never in `VITE_*`):
-   - **AI:** `AI_API_KEY`, `AI_BASE_URL`, `AI_MODEL` (+ optional premium/embedding vars)
+5. Set Edge Function secrets (never in `VITE_*`):
+   - **AI:** `AI_API_KEY`, `AI_BASE_URL`, `AI_MODEL` (+ optional premium/embedding vars). `AI_MAX_OUTPUT_TOKENS` defaults to `4096`.
+   - **Web search (optional):** `WEB_SEARCH_API_KEY` (Tavily-compatible) enables live sources in research mode.
        - **Payments (Flutterwave):** `FLUTTERWAVE_PUBLIC_KEY`, `FLUTTERWAVE_SECRET_KEY`, `FLUTTERWAVE_SECRET_HASH`, `FLUTTERWAVE_BASE_URL`. In Flutterwave enable Rwanda mobile money collections (MTN and Airtel) and set the webhook URL to `https://<project-ref>.supabase.co/functions/v1/payment-webhook`. Test in sandbox first.
    - **Email (Resend):** `RESEND_API_KEY`, `EMAIL_FROM`, `ADMIN_ALERT_EMAIL`
    - **Site/jobs:** `SITE_URL`, `INTERNAL_JOB_SECRET`
+
+Guests (anonymous sessions) receive 15 free AI messages per day, enforced by `begin_ai_request` and configurable through `system_settings.guest_ai_messages_per_day`.
 
 ## Edge Functions
 

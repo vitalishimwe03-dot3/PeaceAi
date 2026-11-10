@@ -15,13 +15,24 @@ export class AiLimitError extends Error {
   }
 }
 
+export type AiMode =
+  | 'chat'
+  | 'proposal'
+  | 'code-review'
+  | 'security-review'
+  | 'research'
+  | 'business'
+  | 'data'
+  | 'writing'
+  | 'tutor'
+
 interface SendAiOptions {
   userId: string
   conversationId: string
   message: string
   attachments?: Attachment[]
   model?: string
-  mode?: 'chat' | 'proposal' | 'code-review' | 'security-review'
+  mode?: AiMode
 }
 
 export async function sendAiMessage({
@@ -87,7 +98,17 @@ function previewReply(message: string, mode: string) {
         ? 'code review'
         : mode === 'security-review'
           ? 'security review'
-          : 'conversation'
+          : mode === 'research'
+            ? 'research'
+            : mode === 'business'
+              ? 'business planning'
+              : mode === 'data'
+                ? 'data analysis'
+                : mode === 'writing'
+                  ? 'writing'
+                  : mode === 'tutor'
+                    ? 'tutoring'
+                    : 'conversation'
   const excerpt = message.trim().slice(0, 220)
   return [
     '**AI provider not connected**',

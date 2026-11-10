@@ -155,8 +155,8 @@ export function CybersecurityPage() {
               <h2 className="text-base font-semibold text-white">Responsible disclosure</h2>
               <p className="mt-1.5 text-sm leading-6 text-slate-400">
                 If you believe you have found a vulnerability in PeaceAI, report it privately to{' '}
-                <a href="mailto:vitalishimwe03@gmail.com" className="text-accent hover:underline">
-                  vitalishimwe03@gmail.com
+                <a href="mailto:vitalishimwe@gmail.com" className="text-accent hover:underline">
+                  vitalishimwe@gmail.com
                 </a>
                 . Do not access other users’ data, disrupt the service, or test without written permission.
                 Read our{' '}

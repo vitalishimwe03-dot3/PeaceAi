@@ -1819,7 +1819,7 @@ export async function updateContentBlock(
 export async function getSystemSettings(): Promise<SystemSetting[]> {
   if (!isSupabaseConfigured) {
     return [
-      { key: 'support_email', value: 'vitalishimwe03@gmail.com', updated_at: new Date().toISOString() },
+      { key: 'support_email', value: 'vitalishimwe@gmail.com', updated_at: new Date().toISOString() },
       { key: 'support_phone', value: '0792448989', updated_at: new Date().toISOString() },
       { key: 'signups_enabled', value: true, updated_at: new Date().toISOString() },
       { key: 'ai_fallback_message', value: 'AI service is temporarily unavailable. Please try again later.', updated_at: new Date().toISOString() },

@@ -17,8 +17,10 @@ import {
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useContent } from '@/contexts/ContentContext'
+import { useToast } from '@/contexts/ToastContext'
 import { listPlans, listServices } from '@/lib/repository'
 import { fallbackFaqs, fallbackPlans, fallbackServices } from '@/lib/catalog'
+import { GUEST_AI_MESSAGE_LIMIT } from '@/lib/env'
 import { SectionHeading } from '@/components/marketing/PageHero'
 import { buttonStyles } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
@@ -26,10 +28,12 @@ import { cn, formatRwf } from '@/lib/utils'
 import type { Plan, Service } from '@/types/domain'
 
 export function HomePage() {
-  const { user } = useAuth()
+  const { user, signInAnonymously, previewSignIn, isPreview } = useAuth()
   const { get } = useContent()
+  const { toast } = useToast()
   const navigate = useNavigate()
   const [prompt, setPrompt] = useState('')
+  const [starting, setStarting] = useState(false)
   const [plans, setPlans] = useState<Plan[]>(fallbackPlans)
   const [services, setServices] = useState<Service[]>(fallbackServices)
 
@@ -38,11 +42,38 @@ export function HomePage() {
     void listServices().then(setServices).catch(() => undefined)
   }, [])
 
-  const startConversation = (event: FormEvent) => {
+  const startConversation = async (event: FormEvent) => {
     event.preventDefault()
-    if (!prompt.trim()) return
-    sessionStorage.setItem('peaceai.initialPrompt', prompt.trim())
-    navigate(user ? '/app/assistant?new=1' : '/signup?next=/app/assistant')
+    if (!prompt.trim() || starting) return
+    const initialPrompt = prompt.trim()
+    sessionStorage.setItem('peaceai.initialPrompt', initialPrompt)
+    if (user) {
+      navigate('/app/assistant?new=1')
+      return
+    }
+    setStarting(true)
+    try {
+      if (isPreview) {
+        await previewSignIn('user')
+      } else {
+        await signInAnonymously()
+      }
+      toast({
+        title: `You have ${GUEST_AI_MESSAGE_LIMIT} free messages`,
+        description: 'Ask PeaceAI anything. Create an account to keep your history and unlock the full workspace.',
+        tone: 'success',
+      })
+      navigate('/app/assistant?new=1')
+    } catch {
+      toast({
+        title: 'Continue with an account',
+        description: 'Guest access is unavailable right now. Create an account to keep chatting.',
+        tone: 'info',
+      })
+      navigate('/signup?next=/app/assistant')
+    } finally {
+      setStarting(false)
+    }
   }
 
   return (
@@ -107,14 +138,14 @@ export function HomePage() {
                   type="submit"
                   className={buttonStyles({ className: 'mb-0.5 h-11 w-11 shrink-0 px-0' })}
                   aria-label="Start conversation"
-                  disabled={!prompt.trim()}
+                  disabled={!prompt.trim() || starting}
                 >
                   <Send className="h-4 w-4" />
                 </button>
               </div>
               <div className="flex flex-wrap items-center gap-2 border-t border-white/[0.06] px-3 py-2 text-[11px] text-slate-500">
                 <Lock className="h-3 w-3 text-accent" />
-                Prompts are protected by authenticated server-side calls
+                {user ? 'Prompts are protected by authenticated server-side calls' : `Try ${GUEST_AI_MESSAGE_LIMIT} free messages before creating an account`}
                 <span className="mx-1 hidden h-3 w-px bg-white/10 sm:block" />
                 <span>No training on your private conversations by default</span>
               </div>

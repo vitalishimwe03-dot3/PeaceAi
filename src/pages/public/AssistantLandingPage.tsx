@@ -1,4 +1,5 @@
-import { Link } from 'react-router-dom'
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import {
   ArrowRight,
   BookOpen,
@@ -13,9 +14,11 @@ import {
   Sparkles,
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
+import { useToast } from '@/contexts/ToastContext'
 import { PageHero, SectionHeading } from '@/components/marketing/PageHero'
 import { buttonStyles } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
+import { GUEST_AI_MESSAGE_LIMIT } from '@/lib/env'
 
 const capabilities = [
   { icon: MessageSquare, title: 'Reason through problems', text: 'Explore options, ask follow-up questions, and turn an unclear brief into concrete next steps.' },
@@ -27,20 +30,54 @@ const capabilities = [
 ]
 
 export function AssistantLandingPage() {
-  const { user } = useAuth()
+  const { user, signInAnonymously, previewSignIn, isPreview } = useAuth()
+  const { toast } = useToast()
+  const navigate = useNavigate()
+  const [starting, setStarting] = useState(false)
+
+  const tryAsGuest = async () => {
+    if (starting) return
+    setStarting(true)
+    try {
+      if (isPreview) await previewSignIn('user')
+      else await signInAnonymously()
+      toast({
+        title: `You have ${GUEST_AI_MESSAGE_LIMIT} free messages`,
+        description: 'Create an account whenever you want to save your conversations and unlock the full workspace.',
+        tone: 'success',
+      })
+      navigate('/app/assistant?new=1')
+    } catch {
+      toast({
+        title: 'Guest access unavailable',
+        description: 'Create a free account to start chatting with PeaceAI.',
+        tone: 'info',
+      })
+      navigate('/signup?next=/app/assistant')
+    } finally {
+      setStarting(false)
+    }
+  }
+
   return (
     <>
       <PageHero
         eyebrow="AI Assistant"
         title={<>A thinking partner for the work that matters.</>}
-        description="Conversations for code, planning, debugging, writing, and technical decisions — saved, searchable, and protected by authenticated server-side calls."
+        description="Conversations for code, planning, debugging, writing, research, business decisions, and technical work — saved, searchable, and protected by authenticated server-side calls."
         actions={
           <>
-            <Link to={user ? '/app/assistant' : '/signup?next=/app/assistant'} className={buttonStyles({ size: 'lg' })}>
-              {user ? 'Open the assistant' : 'Start free'} <ArrowRight className="h-4 w-4" />
-            </Link>
-            <Link to="/pricing" className={buttonStyles({ size: 'lg', variant: 'outline' })}>
-              Compare plans
+            {user ? (
+              <Link to="/app/assistant" className={buttonStyles({ size: 'lg' })}>
+                Open the assistant <ArrowRight className="h-4 w-4" />
+              </Link>
+            ) : (
+              <button type="button" onClick={() => void tryAsGuest()} disabled={starting} className={buttonStyles({ size: 'lg' })}>
+                {starting ? 'Starting…' : `Try ${GUEST_AI_MESSAGE_LIMIT} free messages`} <ArrowRight className="h-4 w-4" />
+              </button>
+            )}
+            <Link to={user ? '/pricing' : '/signup?next=/app/assistant'} className={buttonStyles({ size: 'lg', variant: 'outline' })}>
+              {user ? 'Compare plans' : 'Create a free account'}
             </Link>
           </>
         }
@@ -103,9 +140,15 @@ export function AssistantLandingPage() {
               ))}
             </div>
             <div className="border-t border-white/[0.07] p-4">
-              <Link to={user ? '/app/assistant' : '/signup'} className={buttonStyles({ className: 'w-full' })}>
-                Try it in your workspace <ArrowRight className="h-4 w-4" />
-              </Link>
+              {user ? (
+                <Link to="/app/assistant" className={buttonStyles({ className: 'w-full' })}>
+                  Try it in your workspace <ArrowRight className="h-4 w-4" />
+                </Link>
+              ) : (
+                <button type="button" onClick={() => void tryAsGuest()} disabled={starting} className={buttonStyles({ className: 'w-full' })}>
+                  {starting ? 'Starting…' : `Try ${GUEST_AI_MESSAGE_LIMIT} free messages`} <ArrowRight className="h-4 w-4" />
+                </button>
+              )}
             </div>
           </div>
         </div>

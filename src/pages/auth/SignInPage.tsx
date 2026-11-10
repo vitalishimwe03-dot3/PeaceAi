@@ -6,6 +6,7 @@ import { useToast } from '@/contexts/ToastContext'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Field'
 import { getErrorMessage } from '@/lib/utils'
+import { GUEST_AI_MESSAGE_LIMIT } from '@/lib/env'
 
 export function SignInPage() {
   const { user, signIn, signInAnonymously, previewSignIn, isPreview, loading: authLoading } = useAuth()
@@ -41,7 +42,7 @@ export function SignInPage() {
     setLoading(true)
     try {
       await signInAnonymously()
-      toast({ title: 'Continuing as guest', description: 'AI messages are limited for guest sessions.', tone: 'info' })
+      toast({ title: 'Continuing as guest', description: `You can send ${GUEST_AI_MESSAGE_LIMIT} free AI messages today.`, tone: 'info' })
       navigate(next, { replace: true })
     } catch (err) {
       setError(getErrorMessage(err, 'Guest sign-in failed.'))
@@ -141,7 +142,7 @@ export function SignInPage() {
             Continue as guest
           </button>
           <p className="mt-2 text-center text-[11px] text-slate-500">
-            Guest sessions can use AI messages with a limited daily allowance.
+            Guest sessions include {GUEST_AI_MESSAGE_LIMIT} free AI messages per day.
           </p>
         </div>
       ) : null}

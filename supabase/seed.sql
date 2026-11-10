@@ -332,7 +332,7 @@ on conflict (slug) do update
 
 insert into public.system_settings (key, value)
 values
-  ('support_email', '"vitalishimwe03@gmail.com"'::jsonb),
+  ('support_email', '"vitalishimwe@gmail.com"'::jsonb),
   ('support_phone', '"0792448989"'::jsonb),
   ('signups_enabled', 'true'::jsonb),
   ('ai_fallback_message', '"AI service is temporarily unavailable. Please try again later."'::jsonb)

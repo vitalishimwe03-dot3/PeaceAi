@@ -13,6 +13,7 @@
     "typecheck": "tsc -b --pretty false",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
+    "admin:create": "node scripts/create-admin.mjs",
     "format": "prettier --write ."
   },
   "dependencies": {

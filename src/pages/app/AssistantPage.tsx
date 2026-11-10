@@ -35,7 +35,8 @@ import { Button, buttonStyles } from '@/components/ui/Button'
 import { Modal, ConfirmDialog } from '@/components/ui/Modal'
 import { Input } from '@/components/ui/Field'
 import { Spinner } from '@/components/ui/Spinner'
-import { AiLimitError, sendAiMessage } from '@/lib/ai'
+import { AiLimitError, sendAiMessage, type AiMode } from '@/lib/ai'
+import { GUEST_AI_MESSAGE_LIMIT } from '@/lib/env'
 import {
   createConversation,
   deleteConversation,
@@ -66,8 +67,22 @@ const suggestions = [
   'Debug and fix complex code issues with step by step explanation',
   'Conduct a comprehensive security audit on my codebase',
   'Build a scalable API with authentication, rate limiting & documentation',
-  'Optimize performance and improve code quality',
+  'Research the latest tools for my project and cite sources',
+  'Turn my idea into a lean business plan with pricing and risks',
+  'Analyze this dataset and suggest the metrics I should track',
   'Create production-ready React components with best practices',
+]
+
+const MODES: Array<{ id: AiMode; label: string }> = [
+  { id: 'chat', label: 'Assistant' },
+  { id: 'proposal', label: 'Proposal' },
+  { id: 'code-review', label: 'Code review' },
+  { id: 'security-review', label: 'Security review' },
+  { id: 'research', label: 'Research' },
+  { id: 'business', label: 'Business' },
+  { id: 'data', label: 'Data' },
+  { id: 'writing', label: 'Writing' },
+  { id: 'tutor', label: 'Tutor' },
 ]
 
 export function AssistantPage() {
@@ -80,6 +95,7 @@ export function AssistantPage() {
   const [usage, setUsage] = useState<UsageSummary | null>(null)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [selectedModel, setSelectedModel] = useState<string>('')
+  const [mode, setMode] = useState<AiMode>('chat')
   const [prompt, setPrompt] = useState('')
   const [attachments, setAttachments] = useState<Attachment[]>([])
   const [loadingList, setLoadingList] = useState(true)
@@ -112,7 +128,7 @@ export function AssistantPage() {
         const enabled = modelRows.filter((model) => model.enabled)
         setModels(enabled)
         setSelectedModel(enabled[0]?.model_id ?? '')
-        setUsage(user.isAnonymous ? { ...usageRow, messagesLimit: Math.min(usageRow.messagesLimit, 5) } : usageRow)
+        setUsage(user.isAnonymous ? { ...usageRow, messagesLimit: Math.min(usageRow.messagesLimit, GUEST_AI_MESSAGE_LIMIT) } : usageRow)
         const requested = params.get('conversation')
         const initialPrompt = sessionStorage.getItem('peaceai.initialPrompt')
         if (requested && conversationRows.some((row) => row.id === requested)) {
@@ -181,7 +197,7 @@ export function AssistantPage() {
   const refreshUsage = async () => {
     try {
       const nextUsage = await getUsageSummary(user.id)
-      setUsage(user.isAnonymous ? { ...nextUsage, messagesLimit: Math.min(nextUsage.messagesLimit, 5) } : nextUsage)
+      setUsage(user.isAnonymous ? { ...nextUsage, messagesLimit: Math.min(nextUsage.messagesLimit, GUEST_AI_MESSAGE_LIMIT) } : nextUsage)
     } catch {
       // Usage refresh is best-effort.
     }
@@ -285,6 +301,7 @@ export function AssistantPage() {
         message: content,
         attachments: files,
         model: selectedModel || undefined,
+        mode,
       })
 
       const assistant: Message = {
@@ -765,14 +782,18 @@ export function AssistantPage() {
                   >
                     <Paperclip className="h-4 w-4" />
                   </button>
-                  <button
-                    type="button"
-                    className="rounded-lg p-2 text-slate-500 hover:bg-white/5 hover:text-white"
-                    aria-label="Add context"
-                    title="More options"
+                  <label htmlFor="assistant-mode" className="sr-only">Assistant mode</label>
+                  <select
+                    id="assistant-mode"
+                    value={mode}
+                    onChange={(event) => setMode(event.target.value as AiMode)}
+                    title="Choose how PeaceAI should respond"
+                    className="rounded-lg border border-white/10 bg-ink-900 px-2 py-1.5 text-[11px] text-slate-300 outline-none transition-colors hover:border-white/20 focus:border-accent/50"
                   >
-                    <Plus className="h-4 w-4" />
-                  </button>
+                    {MODES.map((item) => (
+                      <option key={item.id} value={item.id}>{item.label}</option>
+                    ))}
+                  </select>
                   <span className="hidden text-[10px] text-slate-600 sm:block">
                     ⏎ Send · ⇧⏎ New line
                   </span>

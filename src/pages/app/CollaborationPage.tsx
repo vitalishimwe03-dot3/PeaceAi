@@ -248,7 +248,7 @@ export function CollaborationPage() {
     const body = encodeURIComponent(
       `I am reporting this PeaceAI account for abusive content or behaviour.\n\nAccount: ${profile.full_name || 'Unknown'} (${profile.id})\nReported from: ${user.email}\nPlease describe what happened and include any relevant context below:\n\n`,
     )
-    return `mailto:vitalishimwe03@gmail.com?subject=${subject}&body=${body}`
+    return `mailto:vitalishimwe@gmail.com?subject=${subject}&body=${body}`
   }
 
   return (
